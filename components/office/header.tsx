@@ -11,9 +11,9 @@ import SearchInput from "./search-input";
 
 const HeaderComponents = () => {
   return (
-    <div className="flex items-center justify-between bg-slate-200">
+    <div className="flex items-center justify-between bg-slate-200 py-1">
       {/* Left Side */}
-      <div className="mx-4 my-2 flex gap-x-2">
+      <div className="mx-4 flex gap-x-2">
         <Button variant={"ghost"} size={"icon"}>
           <History size={20} />
         </Button>
@@ -23,7 +23,7 @@ const HeaderComponents = () => {
       </div>
 
       {/* Right Side */}
-      <div className="mx-4 my-2 flex gap-x-2">
+      <div className="mx-4 flex gap-x-2">
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="link" className="text-muted-foreground hover:no-underline">
@@ -58,18 +58,17 @@ const HeaderComponents = () => {
           </SheetContent>
         </Sheet>
         <Button variant={"ghost"} size={"icon"} className="bg-primary/70 hover:bg-primary/90">
-          <Plus size={20} />
+          <Plus size={16} />
         </Button>
-        <Separator orientation="vertical" className="mx-1" />
-        <div className="">
+        <div className="flex flex-row">
           <Button variant={"ghost"} size={"icon"}>
-            <Users size={20} />
+            <Users size={16} />
           </Button>
           <Button variant={"ghost"} size={"icon"}>
-            <Bell size={20} />
+            <Bell size={16} />
           </Button>
           <Button variant={"ghost"} size={"icon"}>
-            <Settings size={20} />
+            <Settings size={16} />
           </Button>
         </div>
         <Avatar className="mx-2">
