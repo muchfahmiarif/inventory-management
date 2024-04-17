@@ -2,11 +2,22 @@ import { Building2 } from "lucide-react";
 import React from "react";
 
 import background from "@/public/background-inventory.svg";
+import Link from "next/link";
 
 const NavbarHomePage = () => {
+  const navLink: Array<{ title: string; href: string }> = [
+    { title: "Dashboard", href: "/office/home/dashboard" },
+    { title: "Inventory", href: "/office/home/inventory" },
+    { title: "Customers", href: "/office/home/customers" },
+    { title: "Orders", href: "/office/home/orders" },
+    { title: "Settings", href: "/office/home/settings" },
+  ];
+
   return (
-    <div className="h-32 flex flex-col bg-repeat-x bg-slate-50" style={{ backgroundImage: `url(${background.src})`, width: "100%", height: "100%" }}>
-      <div className="flex flex-row items-center justify-between mx-4 mt-7 z-10">
+    <div
+      className="h-32 flex flex-col bg-repeat-x bg-slate-50 border-b"
+      style={{ backgroundImage: `url(${background.src})`, width: "100%", height: "100%" }}>
+      <div className="flex flex-row items-center justify-between mx-4 mt-7 ">
         <div className="flex items-center justify-center">
           <div className="bg-white border text-muted-foreground p-[0.85rem] rounded-lg">
             <Building2 className="h-5 w-5 stroke-1" />
@@ -23,15 +34,16 @@ const NavbarHomePage = () => {
         </div>
       </div>
 
-      <ul className="flex flex-row pt-5 px-3 gap-x-5 text-[0.92rem] z-10">
+      <nav className="flex flex-row pt-5 px-3 gap-x-5 text-[0.92rem] ">
         {/**
          * TODO: This is the sidebar navigation for the back-office homepage.
          */}
-        <li className="border-b-2 border-b-primary pb-2">Dashboard</li>
-        <li className="border-b-2 border-b-primary pb-2">Getting Started</li>
-        <li className="border-b-2 border-b-primary pb-2">Announcement</li>
-        <li className="border-b-2 border-b-primary pb-2">Recent Updates</li>
-      </ul>
+        {navLink.map((link) => (
+          <Link href={link} key={link.title} className="border-b-2 border-b-primary pb-2">
+            {link.title}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 };
