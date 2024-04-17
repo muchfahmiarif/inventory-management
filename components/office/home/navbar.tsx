@@ -1,16 +1,20 @@
+"use client";
+
 import { Building2 } from "lucide-react";
 import React from "react";
 
 import background from "@/public/background-inventory.svg";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const NavbarHomePage = () => {
+  const pathname = usePathname();
+  console.log(pathname);
   const navLink: Array<{ title: string; href: string }> = [
-    { title: "Dashboard", href: "/office/home/dashboard" },
-    { title: "Inventory", href: "/office/home/inventory" },
-    { title: "Customers", href: "/office/home/customers" },
-    { title: "Orders", href: "/office/home/orders" },
-    { title: "Settings", href: "/office/home/settings" },
+    { title: "Dashboard", href: "/office/home/inventory-dashboard" },
+    { title: "Getting Started", href: "/office/home/getting-started" },
+    { title: "Announcements", href: "/office/home/announcements" },
+    { title: "Recent Updates", href: "/office/home/recent-updates" },
   ];
 
   return (
@@ -39,7 +43,7 @@ const NavbarHomePage = () => {
          * TODO: This is the sidebar navigation for the back-office homepage.
          */}
         {navLink.map((link) => (
-          <Link href={link} key={link.title} className="border-b-2 border-b-primary pb-2">
+          <Link href={link.href} key={link.title} className="border-b-2 border-b-primary pb-2">
             {link.title}
           </Link>
         ))}
