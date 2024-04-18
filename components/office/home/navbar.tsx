@@ -43,7 +43,7 @@ const NavbarHomePage = () => {
          * TODO: This is the sidebar navigation for the back-office homepage.
          */}
         {navLink.map((link) => (
-          <Link href={link.href} key={link.title} className="border-b-2 border-b-primary pb-2">
+          <Link href={link.href} key={link.title} className={pathname === link.href ? "border-b-2 border-b-primary pb-2" : "pb-2"}>
             {link.title}
           </Link>
         ))}
