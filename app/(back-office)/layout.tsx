@@ -11,7 +11,7 @@ const LayoutOffice = ({ children }: LayoutOfficeProps) => {
   return (
     <div className="flex">
       <Sidebar />
-      <main className="bg-slate-100 w-full min-h-screen">
+      <main className="bg-primary-foreground w-full min-h-screen">
         <HeaderComponents />
         {children}
       </main>

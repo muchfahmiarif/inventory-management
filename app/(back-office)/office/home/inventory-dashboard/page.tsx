@@ -1,11 +1,94 @@
 import BannerDashboard from "@/components/office/home/banner-dashboard";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Check, Ellipsis, FileText, Package } from "lucide-react";
 import React from "react";
 
 const DashboardPage = () => {
   return (
-    <div className="h-[200rem]">
+    <div className="h-[200rem] bg-primary-foreground">
       <BannerDashboard />
-      DashboardPage
+      {/* Part 1 */}
+      <div className="flex flex-row justify-between">
+        {/* Sales Activity */}
+        <div className="border flex flex-col rounded-xl mt-10 mx-6">
+          <div className="bg-zinc-100 p-2">
+            <h2 className="text-lg">Sales Activity</h2>
+          </div>
+          <div className="flex flex-row justify-center items-center m-4">
+            <div className="flex flex-col px-8">
+              <Button variant={"ghost"} size={"default"} className="mx-4 flex flex-col p-10">
+                <h5 className="text-blue-500 text-4xl">0</h5>
+                <p className="text-muted-foreground/60 text-xs">Qty</p>
+              </Button>
+              <p className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
+                <div className="rounded-full border border-muted-foreground p-[0.125rem]">
+                  <Check className="h-3 w-3" />
+                </div>
+                To be packed
+              </p>
+            </div>
+            <Separator orientation={"vertical"} />
+            <div className="flex flex-col px-8">
+              <Button variant={"ghost"} size={"default"} className="mx-4 flex flex-col p-10">
+                <h5 className="text-red-500 text-4xl">0</h5>
+                <p className="text-muted-foreground/60 text-xs">Pkgs</p>
+              </Button>
+              <p className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
+                <div className="rounded-full border border-muted-foreground p-[0.125rem]">
+                  <Package className="h-3 w-3" />
+                </div>
+                To be shipped
+              </p>
+            </div>
+            <Separator orientation={"vertical"} />
+            <div className="flex flex-col px-8">
+              <Button variant={"ghost"} size={"default"} className="mx-4 flex flex-col p-10">
+                <h5 className="text-green-500 text-4xl">0</h5>
+                <p className="text-muted-foreground/60 text-xs">Pkgs</p>
+              </Button>
+              <p className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
+                <div className="rounded-full border border-muted-foreground p-[0.125rem]">
+                  <Ellipsis className="h-3 w-3" />
+                </div>
+                To be delivered
+              </p>
+            </div>
+            <Separator orientation={"vertical"} />
+            <div className="flex flex-col px-8">
+              <Button variant={"ghost"} size={"default"} className="mx-4 flex flex-col p-10">
+                <h5 className="text-yellow-500 text-4xl">0</h5>
+                <p className="text-muted-foreground/60 text-xs">Qty</p>
+              </Button>
+              <p className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
+                <div className="rounded-full border border-muted-foreground p-[0.125rem]">
+                  <FileText className="h-3 w-3" />
+                </div>
+                To be invoiced
+              </p>
+            </div>
+          </div>
+        </div>
+        {/* Inventory Summary */}
+        <div className="flex flex-col border rounded-xl mt-10 mx-6">
+          <div className="bg-zinc-100 p-2">
+            <h2 className="text-lg">Inventory Summary</h2>
+          </div>
+          <div className="flex flex-col">
+            <div className="uppercase flex flex-row justify-between">
+              <p>Quantity in hand</p>
+              <p>0</p>
+            </div>
+            <div className="uppercase flex flex-row justify-between">
+              <p>Quantity to be received</p>
+              <p>0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Part 2 */}
+      {/* Part 3 */}
+      {/* Part 4 */}
     </div>
   );
 };
