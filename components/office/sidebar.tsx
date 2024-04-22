@@ -26,7 +26,7 @@ const Sidebar = () => {
   const [isOpen3, setIsOpen3] = React.useState(false);
 
   return (
-    <div className="w-[12.5rem] sticky top-0 max-h-screen bg-slate-800 text-slate-50 flex flex-col justify-between">
+    <div className="w-[12.5rem] max-h-screen bg-slate-800 text-slate-50 flex flex-col justify-between sticky top-0">
       <div className="flex flex-col items-center justify-center">
         {/* Logo */}
         <Button className="flex gap-x-2 py-6 w-full justify-start bg-slate-900 hover:bg-slate-900 rounded-none text-lg">
@@ -133,20 +133,20 @@ const Sidebar = () => {
       </div>
 
       {/* Botton Part */}
-      <div className="flex flex-col items-center justify-center py-4">
-        <div className="my-6 bg-slate-900 py-3 rounded-lg mx-2">
+      <div className="flex flex-col items-center justify-center">
+        <div className="my-6 bg-slate-900 py-3 rounded-lg w-48">
           <div className="space-y-1 border-l-2 border-yellow-200 pl-2 ml-2">
             <p className="text-sm">
               Your <span className="font-bold">Premium</span> plan&apos;s trial expires in <span className="text-yellow-400">0 days</span>.
             </p>
           </div>
           <Separator className="my-4" />
-          <div className="flex h-5 items-center space-x-2 text-sm justify-center">
-            <Button size={"sm"} className="bg-transparent">
+          <div className="flex h-5 items-center space-x-2 text-sm justify-center w-full">
+            <Button size={"sm"} className="bg-transparent text-xs">
               Change plan
             </Button>
             <Separator orientation="vertical" />
-            <Button size={"sm"} className="bg-transparent">
+            <Button size={"sm"} className="bg-transparent text-xs">
               Upgrade
             </Button>
           </div>

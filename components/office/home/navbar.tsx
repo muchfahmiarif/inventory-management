@@ -13,8 +13,8 @@ const NavbarHomePage = () => {
   const navLink: Array<{ title: string; href: string }> = [
     { title: "Dashboard", href: "/office/home/inventory-dashboard" },
     { title: "Getting Started", href: "/office/home/getting-started" },
-    { title: "Announcements", href: "/office/home/announcements" },
     { title: "Recent Updates", href: "/office/home/recent-updates" },
+    { title: "Announcements", href: "/office/home/announcements" },
   ];
 
   return (
