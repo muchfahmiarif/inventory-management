@@ -1,10 +1,16 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Coins, X } from "lucide-react";
 import React from "react";
 
 const BannerDashboard = () => {
+  // TODO: Implement the logic if online payments are set, will be closed by default
+  const [enabled, setEnabled] = React.useState(false);
+
   return (
-    <div className="p-8 flex flex-row justify-between gap-x-12 bg-primary-foreground">
+    <div className={cn(enabled ? "hidden" : "flex", "p-8 flex-row justify-between gap-x-12 bg-primary-foreground")}>
       <div className="flex flex-row">
         <div className="m-6 mr-12">
           <Coins className="h-16 w-16 text-primary" />
@@ -22,7 +28,7 @@ const BannerDashboard = () => {
             Enable
           </Button>
         </div>
-        <Button variant={"secondary"} size={"icon"} className="mx-3">
+        <Button onClick={() => setEnabled(true)} variant={"secondary"} size={"icon"} className="mx-3">
           <X className="h-7 w-7" />
         </Button>
       </div>
