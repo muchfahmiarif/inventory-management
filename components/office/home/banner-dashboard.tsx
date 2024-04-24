@@ -28,7 +28,7 @@ const BannerDashboard = () => {
             Enable
           </Button>
         </div>
-        <Button onClick={() => setEnabled(true)} variant={"secondary"} size={"icon"} className="mx-3">
+        <Button onClick={() => setEnabled(true)} variant={"ghost"} size={"icon"} className="mx-3">
           <X className="h-7 w-7" />
         </Button>
       </div>

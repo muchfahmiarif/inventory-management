@@ -21,12 +21,12 @@ const DashboardPage = () => {
                 <h5 className="text-blue-500 text-4xl">0</h5>
                 <p className="text-muted-foreground/60 text-xs">Qty</p>
               </Button>
-              <p className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
+              <div className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
                 <div className="rounded-full border border-muted-foreground p-[0.125rem]">
                   <Check className="h-3 w-3" />
                 </div>
-                To be packed
-              </p>
+                <p>To be packed</p>
+              </div>
             </div>
             <Separator orientation={"vertical"} />
             <div className="flex flex-col px-8">
@@ -34,12 +34,12 @@ const DashboardPage = () => {
                 <h5 className="text-red-500 text-4xl">0</h5>
                 <p className="text-muted-foreground/60 text-xs">Pkgs</p>
               </Button>
-              <p className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
+              <div className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
                 <div className="rounded-full border border-muted-foreground p-[0.125rem]">
                   <Package className="h-3 w-3" />
                 </div>
-                To be shipped
-              </p>
+                <p>To be shipped</p>
+              </div>
             </div>
             <Separator orientation={"vertical"} />
             <div className="flex flex-col px-8">
@@ -47,12 +47,12 @@ const DashboardPage = () => {
                 <h5 className="text-green-500 text-4xl">0</h5>
                 <p className="text-muted-foreground/60 text-xs">Pkgs</p>
               </Button>
-              <p className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
+              <div className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
                 <div className="rounded-full border border-muted-foreground p-[0.125rem]">
                   <Ellipsis className="h-3 w-3" />
                 </div>
-                To be delivered
-              </p>
+                <p>To be delivered</p>
+              </div>
             </div>
             <Separator orientation={"vertical"} />
             <div className="flex flex-col px-8">
@@ -60,12 +60,12 @@ const DashboardPage = () => {
                 <h5 className="text-yellow-500 text-4xl">0</h5>
                 <p className="text-muted-foreground/60 text-xs">Qty</p>
               </Button>
-              <p className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
+              <div className="uppercase text-muted-foreground text-xs flex flex-row tracking-wider gap-x-2">
                 <div className="rounded-full border border-muted-foreground p-[0.125rem]">
                   <FileText className="h-3 w-3" />
                 </div>
-                To be invoiced
-              </p>
+                <p>To be invoiced</p>
+              </div>
             </div>
           </div>
         </div>
