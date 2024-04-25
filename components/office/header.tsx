@@ -11,7 +11,7 @@ import SearchInput from "./search-input";
 
 const HeaderComponents = () => {
   return (
-    <div className="flex items-center justify-between bg-slate-100 py-1 border-b">
+    <div className="flex items-center justify-between bg-slate-100 py-1 border-b sticky top-0 z-10">
       {/* Left Side */}
       <div className="mx-4 flex gap-x-2">
         <Button variant={"ghost"} size={"icon"}>

@@ -19,7 +19,7 @@ const NavbarHomePage = () => {
 
   return (
     <div
-      className="h-32 flex flex-col bg-repeat-x bg-slate-50 border-b"
+      className="h-32 flex flex-col bg-repeat-x bg-slate-50 border-b sticky -top-8"
       style={{ backgroundImage: `url(${background.src})`, width: "100%", height: "100%" }}>
       <div className="flex flex-row items-center justify-between mx-4 mt-7 ">
         <div className="flex items-center justify-center">

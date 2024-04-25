@@ -26,7 +26,7 @@ const Sidebar = () => {
   const [isOpen3, setIsOpen3] = React.useState(false);
 
   return (
-    <div className="w-[12.5rem] max-h-screen bg-slate-800 text-slate-50 flex flex-col justify-between sticky top-0">
+    <div className="w-[12.5rem] bg-slate-800 text-slate-50 flex flex-col justify-between sticky top-0 h-screen">
       <div className="flex flex-col items-center justify-center">
         {/* Logo */}
         <Button className="flex gap-x-2 py-6 w-full justify-start bg-slate-900 hover:bg-slate-900 rounded-none text-lg">
