@@ -15,7 +15,10 @@ import {
   Unplug,
 } from "lucide-react";
 import React from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
@@ -24,6 +27,22 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isOpen2, setIsOpen2] = React.useState(false);
   const [isOpen3, setIsOpen3] = React.useState(false);
+  const pathname = usePathname();
+
+  const inventoryLinks: Array<{ name: string; href: string }> = [
+    {
+      name: "Items",
+      href: "/office/inventory/items",
+    },
+    {
+      name: "Item Groups",
+      href: "/office/inventory/itemgroups",
+    },
+    {
+      name: "Inventory Adjustments",
+      href: "/office/inventory/adjustments",
+    },
+  ];
 
   return (
     <div className="w-[12.5rem] bg-slate-800 text-slate-50 flex flex-col justify-between sticky top-0 h-screen">
@@ -37,7 +56,7 @@ const Sidebar = () => {
         {/* Top Part */}
         <ul className="flex flex-col w-full pt-3 gap-y-2">
           <li className="px-2">
-            <Button className="w-full justify-start" variant={"default"} size={"sm"}>
+            <Button className="w-full justify-start" variant={"default"} size={"sm"} onClick={() => (window.location.href = "/office/home")}>
               <Home className="mr-2 h-4 w-4" />
               <span>Home</span>
             </Button>
@@ -45,7 +64,10 @@ const Sidebar = () => {
           <li className="px-2">
             <Collapsible open={isOpen3} onOpenChange={setIsOpen3}>
               <CollapsibleTrigger asChild>
-                <Button className="w-full flex flex-row justify-between bg-transparent" variant={"default"} size={"sm"}>
+                <Button
+                  className={cn(isOpen3 ? "bg-slate-900" : "bg-transparent", "w-full flex flex-row justify-between hover:bg-slate-900")}
+                  variant={"default"}
+                  size={"sm"}>
                   <div className="flex items-center">
                     <ShoppingBasket className="mr-2 h-4 w-4" />
                     <span>Inventory</span>
@@ -54,14 +76,20 @@ const Sidebar = () => {
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">
-                <Button className="w-full justify-between bg-transparent ps-9 group" variant={"default"} size={"sm"}>
-                  <span>Home</span>
-                  <CirclePlus className="ml-2 h-4 w-4 hidden group-hover:block" />
-                </Button>
-                <Button className="w-full justify-between bg-transparent ps-9 group" variant={"default"} size={"sm"}>
-                  <span>Home</span>
-                  <CirclePlus className="ml-2 h-4 w-4 hidden group-hover:block" />
-                </Button>
+                {inventoryLinks.map((link) => (
+                  <Link key={link.href} href={link.href}>
+                    <Button
+                      className={cn(
+                        pathname == link.href ? "bg-primary" : "bg-transparent",
+                        "w-full justify-between ps-9 group text-wrap text-start"
+                      )}
+                      variant={"default"}
+                      size={"sm"}>
+                      <span>{link.name}</span>
+                      <CirclePlus className="ml-2 h-4 w-4 hidden group-hover:block" />
+                    </Button>
+                  </Link>
+                ))}
               </CollapsibleContent>
             </Collapsible>
           </li>
