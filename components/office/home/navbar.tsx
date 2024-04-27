@@ -2,10 +2,11 @@
 
 import { Building2 } from "lucide-react";
 import React from "react";
-
-import background from "@/public/background-inventory.svg";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import background from "@/public/background-inventory.svg";
+import { cn } from "@/lib/utils";
 
 const NavbarHomePage = () => {
   const pathname = usePathname();
@@ -43,7 +44,13 @@ const NavbarHomePage = () => {
          * TODO: This is the sidebar navigation for the back-office homepage.
          */}
         {navLink.map((link) => (
-          <Link href={link.href} key={link.title} className={pathname === link.href ? "border-b-2 border-b-primary pb-2" : "pb-2"}>
+          <Link
+            href={link.href}
+            key={link.title}
+            className={cn(
+              pathname === link.href ? "border-b-2 border-b-primary text-slate-800" : "text-muted-foreground",
+              "pb-2 hover:text-slate-800"
+            )}>
             {link.title}
           </Link>
         ))}

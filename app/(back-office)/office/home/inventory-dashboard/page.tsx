@@ -10,7 +10,7 @@ const DashboardPage = () => {
       {/* TODO: CREATE FUNCTION DISABLE BANNER IF PAYMENT METHOD ALREADY SET */}
       {/* <BannerDashboard /> */}
       {/* Part 1 */}
-      <div className="flex flex-row justify-between border-t max-w-screen-lg mx-4 gap-x-4 w-full">
+      <div className="flex flex-row justify-between max-w-screen-lg mx-4 gap-x-4 w-full">
         {/* Sales Activity */}
         <div className="border flex flex-col rounded-xl mt-10">
           <div className="bg-zinc-100 p-2">

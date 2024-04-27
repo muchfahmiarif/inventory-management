@@ -7,16 +7,26 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import SearchInput from "./search-input";
+import SearchInput from "@/components/office/search-input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const HeaderComponents = () => {
   return (
     <div className="flex items-center justify-between bg-slate-100 py-1 border-b sticky top-0 z-10">
       {/* Left Side */}
       <div className="mx-4 flex gap-x-2">
-        <Button variant={"ghost"} size={"icon"}>
-          <History size={20} />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant={"ghost"} size={"icon"}>
+                <History size={20} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Recent Activity</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <div>
           <SearchInput />
         </div>
@@ -57,9 +67,18 @@ const HeaderComponents = () => {
             </SheetFooter>
           </SheetContent>
         </Sheet>
-        <Button variant={"ghost"} size={"icon"} className="bg-primary/70 hover:bg-primary/90">
-          <Plus size={16} />
-        </Button>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant={"ghost"} size={"icon"} className="bg-primary/70 hover:bg-primary/90">
+                <Plus size={16} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Quick Create</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <div className="flex flex-row">
           <Button variant={"ghost"} size={"icon"}>
             <Users size={16} />
