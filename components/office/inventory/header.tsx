@@ -31,11 +31,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Toggle } from "@/components/ui/toggle";
 
-interface NavbarInventoryPageProps {
+interface HeaderInventoryPageProps {
   className?: string;
 }
 
-const NavbarInventoryPage = ({ className }: NavbarInventoryPageProps) => {
+const HeaderInventoryPage = ({ className }: HeaderInventoryPageProps) => {
   return (
     <div className={cn("sticky top-0 mx-2 my-4 flex flex-row justify-between items-center", className)}>
       <DropdownMenu>
@@ -50,7 +50,7 @@ const NavbarInventoryPage = ({ className }: NavbarInventoryPageProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div className="flex flex-row gap-x-4 items-center">
+      <div className="flex flex-row gap-x-2 items-center">
         <Toggle variant={"outline"} size={"sm"}>
           <List className="w-4 h-4" />
         </Toggle>
@@ -114,4 +114,4 @@ const NavbarInventoryPage = ({ className }: NavbarInventoryPageProps) => {
   );
 };
 
-export default NavbarInventoryPage;
+export default HeaderInventoryPage;
