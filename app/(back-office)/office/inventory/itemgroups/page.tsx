@@ -1,50 +1,139 @@
 import React from "react";
 
 import HeaderInventoryPage from "@/components/office/inventory/header";
-import Icon from "@/components/ui/icon";
+import OptionCardInventory from "@/components/office/inventory/option-card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  ArrowDownNarrowWide,
+  ChevronDown,
+  Download,
+  EllipsisVertical,
+  List,
+  Mail,
+  MessageSquare,
+  Plus,
+  PlusCircle,
+  RefreshCcw,
+  Settings,
+  Upload,
+} from "lucide-react";
+import { Toggle } from "@/components/ui/toggle";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
 const InventoryItemGroupsPage = () => {
+  const dataTitle: Array<{ name: string; href: string }> = [
+    {
+      name: "All Item Groups",
+      href: "/office/inventory/itemgroups",
+    },
+    {
+      name: "Active Item Groups",
+      href: "/office/inventory/itemgroups/active",
+    },
+    {
+      name: "Inactive Item Groups",
+      href: "/office/inventory/itemgroups/inactive",
+    },
+  ];
+
   return (
     <>
-      <HeaderInventoryPage className="mr-20" />
+      <HeaderInventoryPage className="mr-20">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center text-xl p-2 border-none">
+            All Item Groups
+            <ChevronDown strokeWidth={"3px"} className="h-4 w-4 text-primary ml-1" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="ml-5 -mt-2">
+            {dataTitle?.map((title) => (
+              <DropdownMenuItem key={title.name} className="cursor-pointer focus:bg-primary focus:text-white ps-4 pr-6">
+                {title.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className="flex flex-row gap-x-2 items-center">
+          <Toggle variant={"outline"} size={"sm"}>
+            <Tooltip>
+              <TooltipTrigger>
+                <List className="w-4 h-4" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Toggle List View</p>
+              </TooltipContent>
+            </Tooltip>
+          </Toggle>
+          <Button className="flex flex-row" size={"sm"}>
+            <Plus className="w-4 h-4" />
+            <p>New</p>
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant={"outline"} size={"sm"}>
+                <EllipsisVertical className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <ArrowDownNarrowWide className="mr-2 h-4 w-4 text-primary" />
+                  <span>Sort by</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem>
+                      <Mail className="mr-2 h-4 w-4" />
+                      <span>Email</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      <span>Message</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      <span>More...</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Download className="mr-2 h-4 w-4 text-primary" />
+                <span>Import Item Groups</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Upload className="mr-2 h-4 w-4 text-primary" />
+                <span>Export Item Groups</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4 text-primary" />
+                <span>Preference</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <RefreshCcw className="mr-2 h-4 w-4 text-primary" />
+                <span>Refresh List</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </HeaderInventoryPage>
       <div className="grid grid-cols-2 justify-center items-center p-4 gap-5 mx-10">
-        {/* Item Groups */}
-        <div className="flex flex-col justify-center items-center drop-shadow-lg bg-white rounded-sm gap-y-2 p-4">
-          <h3 className="font-semibold">Item Group</h3>
-          <Icon className="p-3" width={130} height={130} name="item-groups" />
-          <p className="text-sm">Create multiple variants of the same item using Item Groups</p>
-          <Button size={"sm"} className="mb-6">
-            New Item Group
-          </Button>
-        </div>
-        {/* Items */}
-        <div className="flex flex-col justify-center items-center drop-shadow-lg bg-white rounded-sm gap-y-2 p-4">
-          <h3 className="font-semibold">Items</h3>
-          <Icon className="p-3" width={130} height={130} name="items" />
-          <p className="text-sm">Create standalone items and services that you buy and sell</p>
-          <Button size={"sm"} className="mb-6">
-            New Item
-          </Button>
-        </div>
-        {/* Composite Items */}
-        <div className="flex flex-col justify-center items-center drop-shadow-lg bg-white rounded-sm gap-y-2 p-4">
-          <h3 className="font-semibold">Composite Items</h3>
-          <Icon className="p-3" width={130} height={130} name="composite-items" />
-          <p className="text-sm">Bundle different items together and sell them as kits</p>
-          <Button size={"sm"} className="mb-6">
-            New Composite Item
-          </Button>
-        </div>
-        {/* Price List */}
-        <div className="flex flex-col justify-center items-center drop-shadow-lg bg-white rounded-sm gap-y-2 p-4">
-          <h3 className="font-semibold">Price Lists</h3>
-          <Icon className="p-3" width={130} height={130} name="price-lists" />
-          <p className="text-sm">Tweak your item prices for specific contacts or transactions</p>
-          <Button size={"sm"} className="mb-6">
-            New Price List
-          </Button>
-        </div>
+        <OptionCardInventory />
       </div>
     </>
   );

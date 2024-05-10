@@ -2,7 +2,6 @@ import { Bell, ChevronDown, History, LayoutGrid, Plus, Search, Settings, Users, 
 import React from "react";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
@@ -15,18 +14,16 @@ const HeaderComponents = () => {
     <div className="flex items-center justify-between bg-slate-100 py-1 border-b sticky top-0 z-10">
       {/* Left Side */}
       <div className="mx-4 flex gap-x-2">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant={"ghost"} size={"icon"}>
-                <History size={20} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Recent Activity</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant={"ghost"} size={"icon"}>
+              <History size={20} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Recent Activity</p>
+          </TooltipContent>
+        </Tooltip>
         <div>
           <SearchInput />
         </div>
