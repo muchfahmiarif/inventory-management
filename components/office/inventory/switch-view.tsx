@@ -9,11 +9,15 @@ enum SwitchOptions {
   OPTION2 = "grid",
 }
 
-const SwitchView = (props: { onClick: () => void }) => {
+interface SwitchViewProps {
+  onClick: () => void;
+}
+
+const SwitchView = ({ onClick }: SwitchViewProps) => {
   const [activeOption, setActiveOption] = React.useState<SwitchOptions>(SwitchOptions.OPTION1);
   const handleSwitchClick = (option: SwitchOptions) => {
     setActiveOption(option);
-    console.log("Option selected: ", option);
+    // console.log("Option selected: ", option);
   };
 
   return (

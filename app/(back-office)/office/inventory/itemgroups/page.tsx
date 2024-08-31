@@ -1,7 +1,4 @@
 import React from "react";
-
-import HeaderInventoryPage from "@/components/office/inventory/header";
-import OptionCardInventory from "@/components/office/inventory/option-card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +24,9 @@ import {
   Settings,
   Upload,
 } from "lucide-react";
+
+import HeaderInventoryPage from "@/components/office/inventory/header";
+import OptionCardInventory from "@/components/office/inventory/option-card";
 import { Toggle } from "@/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";

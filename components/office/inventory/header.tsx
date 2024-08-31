@@ -1,36 +1,8 @@
 "use client";
 
-import {
-  ArrowDownNarrowWide,
-  ChevronDown,
-  Download,
-  EllipsisVertical,
-  List,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  RefreshCcw,
-  Settings,
-  Upload,
-} from "lucide-react";
 import React from "react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Toggle } from "@/components/ui/toggle";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface HeaderInventoryPageProps {
   className?: string;

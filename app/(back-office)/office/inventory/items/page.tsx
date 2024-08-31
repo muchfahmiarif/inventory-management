@@ -173,7 +173,8 @@ const InventoryItemsPage = () => {
           </DropdownMenu>
         </div>
       </HeaderInventoryPage>
-      <div>InventoryItemsPage</div>
+      {/* TODO: IMPLEMENT STATE MANAGEMENT */}
+      <div>test</div>
     </>
   );
 };
