@@ -20,16 +20,21 @@ const NavbarHomePage = () => {
 
   return (
     <div
-      className="h-32 flex flex-col bg-repeat-x bg-slate-50 border-b sticky -top-8"
-      style={{ backgroundImage: `url(${background.src})`, width: "100%", height: "100%" }}>
-      <div className="flex flex-row items-center justify-between mx-4 mt-7 ">
+      className="sticky -top-8 flex h-32 flex-col border-b bg-slate-50 bg-repeat-x"
+      style={{
+        backgroundImage: `url(${background.src})`,
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <div className="mx-4 mt-7 flex flex-row items-center justify-between">
         <div className="flex items-center justify-center">
-          <div className="bg-white border text-muted-foreground p-[0.85rem] rounded-lg">
+          <div className="rounded-lg border bg-white p-[0.85rem] text-muted-foreground">
             <Building2 className="h-5 w-5 stroke-1" />
           </div>
-          <div className="flex flex-col ml-2">
-            <div className="font-medium text-lg">Hello, Fahmi Arif G</div>
-            <div className="text-muted-foreground text-xs">Genero</div>
+          <div className="ml-2 flex flex-col">
+            <div className="text-lg font-medium">Hello, Fahmi Arif G</div>
+            <div className="text-xs text-muted-foreground">Genero</div>
           </div>
         </div>
         <div>
@@ -39,7 +44,7 @@ const NavbarHomePage = () => {
         </div>
       </div>
 
-      <nav className="flex flex-row pt-5 px-3 gap-x-5 text-[0.92rem] ">
+      <nav className="flex flex-row gap-x-5 px-3 pt-5 text-[0.92rem]">
         {/**
          * TODO: This is the sidebar navigation for the back-office homepage.
          */}
@@ -48,9 +53,12 @@ const NavbarHomePage = () => {
             href={link.href}
             key={link.title}
             className={cn(
-              pathname === link.href ? "border-b-2 border-b-primary text-slate-800" : "text-muted-foreground",
-              "pb-2 hover:text-slate-800"
-            )}>
+              pathname === link.href
+                ? "border-b-2 border-b-primary text-slate-800"
+                : "text-muted-foreground",
+              "pb-2 hover:text-slate-800",
+            )}
+          >
             {link.title}
           </Link>
         ))}

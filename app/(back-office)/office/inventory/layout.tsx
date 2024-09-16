@@ -6,12 +6,18 @@ interface LayoutInventoryPageProps {
   children: React.ReactNode;
 }
 
-const LayoutInventoryPage: React.FC<LayoutInventoryPageProps> = ({ children }) => {
+const LayoutInventoryPage: React.FC<LayoutInventoryPageProps> = ({
+  children,
+}) => {
   return (
     <div>
       <div className="absolute right-0 top-[4.3rem] flex items-center justify-center">
-        <Button variant={"default"} size={"sm"} className="rounded-l-md rounded-r-none">
-          <MessageCircleQuestion className="w-5 h-5" />
+        <Button
+          variant={"default"}
+          size={"sm"}
+          className="rounded-l-md rounded-r-none"
+        >
+          <MessageCircleQuestion className="h-5 w-5" />
         </Button>
       </div>
       <div>{children}</div>

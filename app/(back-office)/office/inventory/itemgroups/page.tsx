@@ -28,7 +28,11 @@ import {
 import HeaderInventoryPage from "@/components/office/inventory/header";
 import OptionCardInventory from "@/components/office/inventory/option-card";
 import { Toggle } from "@/components/ui/toggle";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 
 const InventoryItemGroupsPage = () => {
@@ -51,24 +55,30 @@ const InventoryItemGroupsPage = () => {
     <>
       <HeaderInventoryPage className="mr-20">
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center text-xl p-2 border-none">
+          <DropdownMenuTrigger className="flex items-center border-none p-2 text-xl">
             All Item Groups
-            <ChevronDown strokeWidth={"3px"} className="h-4 w-4 text-primary ml-1" />
+            <ChevronDown
+              strokeWidth={"3px"}
+              className="ml-1 h-4 w-4 text-primary"
+            />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="ml-5 -mt-2">
+          <DropdownMenuContent className="-mt-2 ml-5">
             {dataTitle?.map((title) => (
-              <DropdownMenuItem key={title.name} className="cursor-pointer focus:bg-primary focus:text-white ps-4 pr-6">
+              <DropdownMenuItem
+                key={title.name}
+                className="cursor-pointer pr-6 ps-4 focus:bg-primary focus:text-white"
+              >
                 {title.name}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="flex flex-row gap-x-2 items-center">
+        <div className="flex flex-row items-center gap-x-2">
           <Toggle variant={"outline"} size={"sm"}>
             <Tooltip>
               <TooltipTrigger>
-                <List className="w-4 h-4" />
+                <List className="h-4 w-4" />
               </TooltipTrigger>
               <TooltipContent>
                 <p>Toggle List View</p>
@@ -76,13 +86,13 @@ const InventoryItemGroupsPage = () => {
             </Tooltip>
           </Toggle>
           <Button className="flex flex-row" size={"sm"}>
-            <Plus className="w-4 h-4" />
+            <Plus className="h-4 w-4" />
             <p>New</p>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"outline"} size={"sm"}>
-                <EllipsisVertical className="w-4 h-4" />
+                <EllipsisVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
@@ -132,7 +142,7 @@ const InventoryItemGroupsPage = () => {
           </DropdownMenu>
         </div>
       </HeaderInventoryPage>
-      <div className="grid grid-cols-2 justify-center items-center p-4 gap-5 mx-10">
+      <div className="mx-10 grid grid-cols-2 items-center justify-center gap-5 p-4">
         <OptionCardInventory />
       </div>
     </>

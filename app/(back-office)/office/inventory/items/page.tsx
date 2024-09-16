@@ -89,30 +89,36 @@ const InventoryItemsPage = () => {
     <>
       <HeaderInventoryPage className="mr-20">
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center text-xl p-2 border-none">
+          <DropdownMenuTrigger className="flex items-center border-none p-2 text-xl">
             All Item Groups
-            <ChevronDown strokeWidth={"3px"} className="h-4 w-4 text-primary ml-1" />
+            <ChevronDown
+              strokeWidth={"3px"}
+              className="ml-1 h-4 w-4 text-primary"
+            />
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="ml-20 -mt-2">
+          <DropdownMenuContent className="-mt-2 ml-20">
             <ScrollArea className="h-72 w-52 rounded-md">
               {dataTitle?.map((title) => (
-                <DropdownMenuItem key={title.name} className="cursor-pointer focus:bg-primary focus:text-white ps-4 pr-6">
+                <DropdownMenuItem
+                  key={title.name}
+                  className="cursor-pointer pr-6 ps-4 focus:bg-primary focus:text-white"
+                >
                   {title.name}
                 </DropdownMenuItem>
               ))}
             </ScrollArea>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="flex gap-x-2 ml-2 cursor-pointer hover:text-primary group ">
+            <DropdownMenuItem className="group ml-2 flex cursor-pointer gap-x-2 hover:text-primary">
               <PlusCircle className="h-4 w-4" />
               <span className="group-hover:text-primary">New Custom View</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="flex flex-row gap-x-2 items-center">
+        <div className="flex flex-row items-center gap-x-2">
           {/* TODO: CREATE FUNCTION ONCLICK TO NEW PAGE */}
           <Button className="flex flex-row" size={"sm"}>
-            <Plus className="w-4 h-4" />
+            <Plus className="h-4 w-4" />
             <p>New</p>
           </Button>
           <SwitchView
@@ -123,7 +129,7 @@ const InventoryItemsPage = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"outline"} size={"sm"}>
-                <EllipsisVertical className="w-4 h-4" />
+                <EllipsisVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">

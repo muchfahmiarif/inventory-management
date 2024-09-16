@@ -27,20 +27,24 @@ const SearchInput = ({ children, value, className }: SearchInputProps) => {
         Search
       </label>
       <div className="relative w-full">
-        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-          <Search className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+        <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
+          <Search className="h-4 w-4 text-gray-500 dark:text-gray-400" />
         </div>
         <input
           type="text"
           id="search"
-          className="border text-sm rounded-lg block w-full ps-10 p-2 hover:border-primary focus-visible:outline-none focus-visible:border focus-visible:border-primary "
+          className="block w-full rounded-lg border p-2 ps-10 text-sm hover:border-primary focus-visible:border focus-visible:border-primary focus-visible:outline-none"
           placeholder="Search in Customers ( / )"
           autoComplete="off"
           onChange={handleInputChange}
           value={value || inputValue}
         />
         {inputValue && (
-          <button type="button" className="absolute inset-y-0 end-0 flex items-center pe-3" onClick={handleDelete}>
+          <button
+            type="button"
+            className="absolute inset-y-0 end-0 flex items-center pe-3"
+            onClick={handleDelete}
+          >
             <X size={16} className="text-muted-foreground" />
           </button>
         )}

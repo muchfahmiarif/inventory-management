@@ -13,7 +13,7 @@ const LayoutOffice = ({ children }: LayoutOfficeProps) => {
     <div className="flex">
       <TooltipProvider>
         <Sidebar />
-        <main className="bg-primary-foreground w-full min-h-screen">
+        <main className="min-h-screen w-full bg-primary-foreground dark:bg-gray-950">
           <HeaderComponents />
           {children}
         </main>

@@ -14,7 +14,9 @@ interface SwitchViewProps {
 }
 
 const SwitchView = ({ onClick }: SwitchViewProps) => {
-  const [activeOption, setActiveOption] = React.useState<SwitchOptions>(SwitchOptions.OPTION1);
+  const [activeOption, setActiveOption] = React.useState<SwitchOptions>(
+    SwitchOptions.OPTION1,
+  );
   const handleSwitchClick = (option: SwitchOptions) => {
     setActiveOption(option);
     // console.log("Option selected: ", option);
@@ -22,23 +24,33 @@ const SwitchView = ({ onClick }: SwitchViewProps) => {
 
   return (
     <>
-      <div className="flex bg-black items-center rounded-lg w-max h-max">
+      <div className="flex h-max w-max items-center rounded-lg bg-black">
         <div
-          className={cn(activeOption !== SwitchOptions.OPTION1 ? "cursor-pointer" : "", "rounded-l-lg h-9 w-10 flex items-center justify-center p-2")}
+          className={cn(
+            activeOption !== SwitchOptions.OPTION1 ? "cursor-pointer" : "",
+            "flex h-9 w-10 items-center justify-center rounded-l-lg p-2",
+          )}
           style={{
-            backgroundColor: activeOption === SwitchOptions.OPTION1 ? "grey" : "transparent",
+            backgroundColor:
+              activeOption === SwitchOptions.OPTION1 ? "grey" : "transparent",
           }}
-          onClick={() => handleSwitchClick(SwitchOptions.OPTION1)}>
+          onClick={() => handleSwitchClick(SwitchOptions.OPTION1)}
+        >
           <div className={"text-white"}>
             <List className="h-4 w-4" />
           </div>
         </div>
         <div
-          className={cn(activeOption !== SwitchOptions.OPTION2 ? "cursor-pointer" : "", "rounded-r-lg h-9 w-10 flex items-center justify-center p-2")}
+          className={cn(
+            activeOption !== SwitchOptions.OPTION2 ? "cursor-pointer" : "",
+            "flex h-9 w-10 items-center justify-center rounded-r-lg p-2",
+          )}
           style={{
-            backgroundColor: activeOption === SwitchOptions.OPTION2 ? "grey" : "transparent",
+            backgroundColor:
+              activeOption === SwitchOptions.OPTION2 ? "grey" : "transparent",
           }}
-          onClick={() => handleSwitchClick(SwitchOptions.OPTION2)}>
+          onClick={() => handleSwitchClick(SwitchOptions.OPTION2)}
+        >
           <div className={"text-white"}>
             <LayoutGrid className="h-4 w-4" />
           </div>

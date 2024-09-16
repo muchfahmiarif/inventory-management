@@ -12,7 +12,10 @@ interface HeaderInventoryPageProps {
   children?: React.ReactNode;
 }
 
-const HeaderInventoryPage = ({ className, children }: HeaderInventoryPageProps) => {
+const HeaderInventoryPage = ({
+  className,
+  children,
+}: HeaderInventoryPageProps) => {
   const [isMounter, setIsMounter] = React.useState(false);
 
   React.useEffect(() => {
@@ -21,7 +24,16 @@ const HeaderInventoryPage = ({ className, children }: HeaderInventoryPageProps) 
 
   if (!isMounter) return null;
 
-  return <div className={cn("sticky top-0 mx-2 my-4 flex flex-row justify-between items-center", className)}>{children}</div>;
+  return (
+    <div
+      className={cn(
+        "sticky top-0 mx-2 my-4 flex flex-row items-center justify-between",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
 };
 
 export default HeaderInventoryPage;

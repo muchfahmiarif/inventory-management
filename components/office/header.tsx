@@ -1,17 +1,42 @@
-import { Bell, ChevronDown, History, LayoutGrid, Plus, Search, Settings, Users, X } from "lucide-react";
+import {
+  Bell,
+  ChevronDown,
+  History,
+  LayoutGrid,
+  Plus,
+  Search,
+  Settings,
+  Users,
+  X,
+} from "lucide-react";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import SearchInput from "@/components/office/search-input";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import ThemeToggle from "../ui/theme-toggle";
 
 const HeaderComponents = () => {
   return (
-    <div className="flex items-center justify-between bg-slate-100 py-1 border-b sticky top-0 z-10">
+    <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-slate-100 py-1">
       {/* Left Side */}
       <div className="mx-4 flex gap-x-2">
         <Tooltip>
@@ -33,7 +58,10 @@ const HeaderComponents = () => {
       <div className="mx-4 flex gap-x-2">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="link" className="text-muted-foreground hover:no-underline">
+            <Button
+              variant="link"
+              className="text-muted-foreground hover:no-underline"
+            >
               Personal
               <ChevronDown size={20} className="ml-1" />
             </Button>
@@ -41,7 +69,10 @@ const HeaderComponents = () => {
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Edit profile</SheetTitle>
-              <SheetDescription>Make changes to your profile here. Click save when you&apos;re done.</SheetDescription>
+              <SheetDescription>
+                Make changes to your profile here. Click save when you&apos;re
+                done.
+              </SheetDescription>
             </SheetHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
@@ -64,10 +95,15 @@ const HeaderComponents = () => {
             </SheetFooter>
           </SheetContent>
         </Sheet>
+        <ThemeToggle />
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant={"ghost"} size={"icon"} className="bg-primary/70 hover:bg-primary/90">
+              <Button
+                variant={"ghost"}
+                size={"icon"}
+                className="bg-primary/70 hover:bg-primary/90"
+              >
                 <Plus size={16} />
               </Button>
             </TooltipTrigger>
