@@ -62,6 +62,11 @@ const Sidebar = () => {
       new: "/office/inventory/adjustments/new",
     },
     {
+      name: "Stock Counts",
+      href: "/office/stock-counts",
+      new: "/office/stock-counts/new",
+    },
+    {
       name: "Transfer Orders",
       href: "/office/transfers",
       new: "/office/transfers/new",

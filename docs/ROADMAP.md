@@ -141,19 +141,20 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
 - [ ] Sidebar Inventory section fully live; option-card CTA buttons link to the
       four modules.
 
-## Phase 2 — Stock operations
+## Phase 2 — Stock operations ✅ (2026-11-20)
 
-- [ ] **Inventory Adjustments**: list (date, reference, reason, status); New
-      (warehouse, reason, adjusted-qty lines); status Approved; writes
-      `stock_movements`.
+- [x] **Inventory Adjustments**: list (AD-#### numbered, date, reference,
+      reason, Approved); New (warehouse, reason, item picker showing system
+      qty, adjusted qty); ledger writes per line diff; delete reverses ledger.
+- [x] **Warehouses**: full CRUD at `/office/warehouse` (default flag,
+      address/contact fields, detail page).
+- [x] **Transfer Orders**: TO-#### list; New (from/to validation); workflow
+      Create → Mark Shipped (stock out) → Mark Received (stock in); delete
+      reverses shipped stock.
+- [x] Verified E2E: adjustment +5 → stock 20; transfer 3 units between
+      warehouses, per-warehouse ledger totals exact.
 - [ ] **Stock Counts**: list; New (warehouse, items with system vs counted qty);
-      on save generates adjustment.
-- [ ] **Warehouses**: list (name, location, contact); New warehouse form; detail
-      page.
-- [ ] **Transfer Orders**: list; New (from/to warehouse, line items); workflow
-      Create → Mark Shipped → Mark Received, movements at both ends.
-- [ ] Verify: adjustment changes stock-on-hand; transfer moves stock between
-      warehouses.
+      on complete generates adjustment.
 
 ## Phase 3 — Sales
 
