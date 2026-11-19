@@ -7,6 +7,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
+import { contacts } from "./contacts";
 import { taxes } from "./settings";
 
 export const itemTypeEnum = pgEnum("item_type", [
@@ -79,6 +80,8 @@ export const items = pgTable("items", {
     scale: 4,
     mode: "number",
   }),
+  // Buy Info: preferred vendor (Zoho item form)
+  preferredVendorId: uuid("preferred_vendor_id").references(() => contacts.id),
   status: itemStatusEnum("status").notNull().default("active"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),

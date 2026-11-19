@@ -42,14 +42,23 @@ const features = tableFeatures({
 
 type Features = typeof features;
 
+// Exported so pages can type their column defs against the same feature set
+export type DataTableFeatures = Features;
+
 interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<Features, TData, unknown>[];
   data: TData[];
   // Adds a leading checkbox column + bulk-action bar (Zoho list behaviour)
   enableSelection?: boolean;
-  bulkActions?: React.ReactNode;
+  // Render prop: receives selected row ids (via getRowId) and a reset callback
+  bulkActions?:
+    | React.ReactNode
+    | ((selectedIds: string[], clearSelection: () => void) => React.ReactNode);
   pageSize?: number;
   emptyMessage?: string;
+  // Row id resolver; defaults to index. Pass e.g. (row) => row.id so bulk
+  // actions receive real record ids.
+  getRowId?: (row: TData, index: number) => string;
 }
 
 // Generic Zoho-style list table: sortable headers, checkbox selection with
@@ -61,6 +70,7 @@ function DataTable<TData extends RowData>({
   bulkActions,
   pageSize = 25,
   emptyMessage = "No records found",
+  getRowId: getRowIdProp,
 }: DataTableProps<TData>) {
   const selectionColumn: ColumnDef<Features, TData, unknown> = {
     id: "select",
@@ -89,13 +99,22 @@ function DataTable<TData extends RowData>({
     columns: enableSelection ? [selectionColumn, ...columns] : columns,
     data,
     enableRowSelection: true,
-    getRowId: (_row, index) => String(index),
+    getRowId: getRowIdProp ?? ((_row, index) => String(index)),
     initialState: { pagination: { pageIndex: 0, pageSize } },
   });
 
   const selectedCount = table.getSelectedRowModel().rows.length;
   const { pageIndex } = table.state.pagination;
   const pageCount = Math.max(1, table.getPageCount());
+
+  const selectedIds = enableSelection
+    ? table.getSelectedRowModel().rows.map((row) => row.id)
+    : [];
+
+  const resolveBulkActions =
+    typeof bulkActions === "function"
+      ? bulkActions(selectedIds, () => table.resetRowSelection())
+      : bulkActions;
 
   return (
     <div className="flex flex-col gap-2">
@@ -104,7 +123,7 @@ function DataTable<TData extends RowData>({
           <p className="text-sm font-medium">
             {selectedCount} row{selectedCount > 1 ? "s" : ""} selected
           </p>
-          <div className="flex items-center gap-2">{bulkActions}</div>
+          <div className="flex items-center gap-2">{resolveBulkActions}</div>
         </div>
       )}
 
@@ -115,22 +134,24 @@ function DataTable<TData extends RowData>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
-                    <button
-                      type="button"
-                      className={cn(
-                        "flex items-center gap-1 font-medium",
-                        header.column.getCanSort() && "cursor-pointer",
-                      )}
-                      onClick={header.column.getToggleSortingHandler()}
-                    >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                      {header.column.getCanSort() && (
+                    {header.column.getCanSort() ? (
+                      <button
+                        type="button"
+                        className={cn(
+                          "flex items-center gap-1 font-medium",
+                          header.column.getCanSort() && "cursor-pointer",
+                        )}
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                         <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground" />
-                      )}
-                    </button>
+                      </button>
+                    ) : (
+                      flexRender(header.column.columnDef.header, header.getContext())
+                    )}
                   </TableHead>
                 ))}
               </TableRow>
