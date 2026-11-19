@@ -180,22 +180,60 @@ const Sidebar = () => {
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">
-                <Button
-                  className="group w-full justify-between bg-transparent ps-9"
-                  variant={"default"}
-                  size={"sm"}
-                >
-                  <span>Home</span>
-                  <CirclePlus className="ml-2 hidden h-4 w-4 group-hover:block" />
-                </Button>
-                <Button
-                  className="group w-full justify-between bg-transparent ps-9"
-                  variant={"default"}
-                  size={"sm"}
-                >
-                  <span>Home</span>
-                  <CirclePlus className="ml-2 hidden h-4 w-4 group-hover:block" />
-                </Button>
+                <div className="group flex w-full">
+                  <Button
+                    className="flex-1 justify-start bg-transparent ps-9"
+                    variant={"default"}
+                    size={"sm"}
+                    asChild
+                  >
+                    <Link href="/office/sales/customers">
+                      <span>Customers</span>
+                    </Link>
+                  </Button>
+                  <Button
+                    className="bg-transparent px-2"
+                    variant={"default"}
+                    size={"sm"}
+                    asChild
+                  >
+                    <Link href="/office/sales/customers/new" aria-label="New Customer">
+                      <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                    </Link>
+                  </Button>
+                </div>
+                <div className="group flex w-full">
+                  <Button
+                    className="flex-1 justify-start bg-transparent ps-9"
+                    variant={"default"}
+                    size={"sm"}
+                  >
+                    <span>Estimates</span>
+                  </Button>
+                  <Button
+                    className="bg-transparent px-2"
+                    variant={"default"}
+                    size={"sm"}
+                  >
+                    <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                  </Button>
+                </div>
+                <div className="group flex w-full">
+                  <Button
+                    className="flex-1 justify-start bg-transparent ps-9"
+                    variant={"default"}
+                    size={"sm"}
+                  >
+                    <span>Invoices</span>
+                  </Button>
+                  <Button
+                    className="bg-transparent px-2"
+                    variant={"default"}
+                    size={"sm"}
+                  >
+                    <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                  </Button>
+                </div>
               </CollapsibleContent>
             </Collapsible>
           </li>
