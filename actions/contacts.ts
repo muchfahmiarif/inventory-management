@@ -55,16 +55,12 @@ export async function createContact(
   const data = parsed.data;
 
   const id = await db.transaction(async (tx) => {
-    const module = type === "customer" ? "customers" : "vendors";
-    const number = await nextNumber(tx, module);
+    // Zoho doesn't auto-number contacts; the series stays reserved
     const [contact] = await tx
       .insert(contacts)
       .values({
         type,
         ...toValues(data),
-        // displayCode-like audit: keep the generated number in notes? No —
-        // contacts don't carry numbers in Zoho; the series is reserved for
-        // future display use. Store nothing extra.
       })
       .returning();
     return contact.id;

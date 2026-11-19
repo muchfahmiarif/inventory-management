@@ -1,4 +1,3 @@
-import { asc } from "drizzle-orm";
 import { eq } from "drizzle-orm";
 
 import { ContactsList } from "@/components/office/contacts/contact-views";
