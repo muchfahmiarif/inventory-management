@@ -1,14 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Switch } from "./switch";
 import { useTheme } from "next-themes";
 
+const noopSubscribe = () => () => {};
+
 const ThemeToggle = () => {
   const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  // Detect client mount without setState-in-effect (react-hooks/set-state-in-effect)
+  const mounted = React.useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
 
   if (!mounted) return null;
 

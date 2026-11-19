@@ -33,18 +33,21 @@ const Sidebar = () => {
   const [isOpen3, setIsOpen3] = React.useState(false);
   const pathname = usePathname();
 
-  const inventoryLinks: Array<{ name: string; href: string }> = [
+  const inventoryLinks: Array<{ name: string; href: string; new: string }> = [
     {
       name: "Items",
       href: "/office/inventory/items",
+      new: "/office/inventory/items/new",
     },
     {
       name: "Item Groups",
       href: "/office/inventory/itemgroups",
+      new: "/office/inventory/itemgroups/new",
     },
     {
       name: "Inventory Adjustments",
       href: "/office/inventory/adjustments",
+      new: "/office/inventory/adjustments/new",
     },
   ];
 
@@ -61,13 +64,18 @@ const Sidebar = () => {
         <ul className="flex w-full flex-col gap-y-2 pt-3">
           <li className="px-2">
             <Button
-              className="w-full justify-start"
+              className={cn(
+                pathname.startsWith("/office/home") ? "bg-primary" : "bg-transparent",
+                "w-full justify-start",
+              )}
               variant={"default"}
               size={"sm"}
-              onClick={() => (window.location.href = "/office/home")}
+              asChild
             >
-              <Home className="mr-2 h-4 w-4" />
-              <span>Home</span>
+              <Link href="/office/home">
+                <Home className="mr-2 h-4 w-4" />
+                <span>Home</span>
+              </Link>
             </Button>
           </li>
           <li className="px-2">
@@ -106,7 +114,9 @@ const Sidebar = () => {
                       size={"sm"}
                     >
                       <span>{link.name}</span>
-                      <CirclePlus className="ml-2 hidden h-4 w-4 group-hover:block" />
+                      <Link href={link.new}>
+                        <CirclePlus className="ml-2 hidden h-4 w-4 group-hover:block" />
+                      </Link>
                     </Button>
                   </Link>
                 ))}
@@ -212,7 +222,7 @@ const Sidebar = () => {
               size={"sm"}
             >
               <NotepadText className="mr-2 h-4 w-4" />
-              <span>Integration</span>
+              <span>Reports</span>
             </Button>
           </li>
           <li className="px-2">

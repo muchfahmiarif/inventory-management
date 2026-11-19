@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   DropdownMenu,
@@ -15,7 +17,6 @@ import {
   ChevronDown,
   Download,
   EllipsisVertical,
-  List,
   Mail,
   MessageSquare,
   Plus,
@@ -24,18 +25,19 @@ import {
   Settings,
   Upload,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import HeaderInventoryPage from "@/components/office/inventory/header";
 import OptionCardInventory from "@/components/office/inventory/option-card";
-import { Toggle } from "@/components/ui/toggle";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import SwitchView from "@/components/shared/switch-view";
+import useView from "@/store/useView";
 import { Button } from "@/components/ui/button";
 
 const InventoryItemGroupsPage = () => {
+  const { push } = useRouter();
+  const view = useView((state) => state.view);
+  const setView = useView((state) => state.setView);
+
   const dataTitle: Array<{ name: string; href: string }> = [
     {
       name: "All Item Groups",
@@ -43,11 +45,11 @@ const InventoryItemGroupsPage = () => {
     },
     {
       name: "Active Item Groups",
-      href: "/office/inventory/itemgroups/active",
+      href: "/office/inventory/itemgroups?view=active",
     },
     {
       name: "Inactive Item Groups",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/itemgroups?view=inactive",
     },
   ];
 
@@ -75,17 +77,12 @@ const InventoryItemGroupsPage = () => {
         </DropdownMenu>
 
         <div className="flex flex-row items-center gap-x-2">
-          <Toggle variant={"outline"} size={"sm"}>
-            <Tooltip>
-              <TooltipTrigger>
-                <List className="h-4 w-4" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Toggle List View</p>
-              </TooltipContent>
-            </Tooltip>
-          </Toggle>
-          <Button className="flex flex-row" size={"sm"}>
+          <SwitchView value={view} onChange={setView} />
+          <Button
+            className="flex flex-row"
+            size={"sm"}
+            onClick={() => push("/office/inventory/itemgroups/new")}
+          >
             <Plus className="h-4 w-4" />
             <p>New</p>
           </Button>

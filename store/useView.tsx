@@ -2,14 +2,16 @@
 
 import { create } from "zustand";
 
-enum View {
-  GRID,
-  LIST,
+export type View = "list" | "grid";
+
+interface ViewState {
+  view: View;
+  setView: (view: View) => void;
 }
 
-const useView = create((set) => ({
-  view: View.GRID,
-  setView: (view: View) => set({ view }),
+const useView = create<ViewState>((set) => ({
+  view: "list",
+  setView: (view) => set({ view }),
 }));
 
 export default useView;

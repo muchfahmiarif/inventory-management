@@ -1,15 +1,7 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { redirect } from "next/navigation";
 
 const HomePage = () => {
-  const { push } = useRouter();
-
-  useEffect(() => {
-    push("/office/home/inventory-dashboard");
-  }, [push]);
-  return <div></div>;
+  redirect("/office/home/inventory-dashboard");
 };
 
 export default HomePage;

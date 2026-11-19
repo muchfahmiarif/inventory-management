@@ -16,7 +16,7 @@ const SearchInput = ({ children, value, className }: SearchInputProps) => {
     setInputValue(e.target.value);
   };
 
-  const handleDelete = (e: any) => {
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setInputValue("");
   };

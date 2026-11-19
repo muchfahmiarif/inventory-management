@@ -20,7 +20,6 @@ import {
   ChevronDown,
   Download,
   EllipsisVertical,
-  List,
   Mail,
   MessageSquare,
   Plus,
@@ -29,59 +28,65 @@ import {
   Settings,
   Upload,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import SwitchView from "@/components/office/inventory/switch-view";
+import SwitchView from "@/components/shared/switch-view";
+import useView from "@/store/useView";
 
 const InventoryItemsPage = () => {
+  const { push } = useRouter();
+  const view = useView((state) => state.view);
+  const setView = useView((state) => state.setView);
+
   const dataTitle: Array<{ name: string; href: string }> = [
     {
       name: "All Items",
-      href: "/office/inventory/itemgroups",
+      href: "/office/inventory/items",
     },
     {
       name: "Active Items",
-      href: "/office/inventory/itemgroups/active",
+      href: "/office/inventory/items?view=active",
     },
     {
       name: "Ungrouped Items",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=ungrouped",
     },
     {
       name: "Low Stock Items",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=low-stock",
     },
     {
       name: "Sales",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=sales",
     },
     {
       name: "Purchases",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=purchases",
     },
     {
       name: "Inventory Items",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=inventory",
     },
     {
       name: "Non Inventory Items",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=non-inventory",
     },
     {
       name: "Services",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=services",
     },
     {
       name: "Inactive Items",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=inactive",
     },
     {
       name: "Returned Items",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=returned",
     },
     {
       name: "Non Returned Items",
-      href: "/office/inventory/itemgroups/inactive",
+      href: "/office/inventory/items?view=non-returned",
     },
   ];
 
@@ -90,7 +95,7 @@ const InventoryItemsPage = () => {
       <HeaderInventoryPage className="mr-20">
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center border-none p-2 text-xl">
-            All Item Groups
+            All Items
             <ChevronDown
               strokeWidth={"3px"}
               className="ml-1 h-4 w-4 text-primary"
@@ -116,16 +121,15 @@ const InventoryItemsPage = () => {
         </DropdownMenu>
 
         <div className="flex flex-row items-center gap-x-2">
-          {/* TODO: CREATE FUNCTION ONCLICK TO NEW PAGE */}
-          <Button className="flex flex-row" size={"sm"}>
+          <Button
+            className="flex flex-row"
+            size={"sm"}
+            onClick={() => push("/office/inventory/items/new")}
+          >
             <Plus className="h-4 w-4" />
             <p>New</p>
           </Button>
-          <SwitchView
-            onClick={() => {
-              true;
-            }}
-          />
+          <SwitchView value={view} onChange={setView} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant={"outline"} size={"sm"}>
@@ -159,11 +163,11 @@ const InventoryItemsPage = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <Download className="mr-2 h-4 w-4 text-primary" />
-                <span>Import Item Groups</span>
+                <span>Import Items</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Upload className="mr-2 h-4 w-4 text-primary" />
-                <span>Export Item Groups</span>
+                <span>Export Items</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>

@@ -12,18 +12,12 @@ interface HeaderInventoryPageProps {
   children?: React.ReactNode;
 }
 
+// Sticky toolbar container for inventory list pages. Renders children directly
+// (no pre-mount guard) so the toolbar is visible in SSR HTML.
 const HeaderInventoryPage = ({
   className,
   children,
 }: HeaderInventoryPageProps) => {
-  const [isMounter, setIsMounter] = React.useState(false);
-
-  React.useEffect(() => {
-    setIsMounter(true);
-  }, []);
-
-  if (!isMounter) return null;
-
   return (
     <div
       className={cn(
