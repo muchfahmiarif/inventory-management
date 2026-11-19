@@ -13,9 +13,10 @@ import {
   ShoppingBasket,
   ShoppingCart,
   Unplug,
+  Warehouse,
 } from "lucide-react";
 import React from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -32,6 +33,7 @@ const Sidebar = () => {
   const [isOpen2, setIsOpen2] = React.useState(false);
   const [isOpen3, setIsOpen3] = React.useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const inventoryLinks: Array<{ name: string; href: string; new: string }> = [
     {
@@ -58,6 +60,11 @@ const Sidebar = () => {
       name: "Inventory Adjustments",
       href: "/office/inventory/adjustments",
       new: "/office/inventory/adjustments/new",
+    },
+    {
+      name: "Transfer Orders",
+      href: "/office/transfers",
+      new: "/office/transfers/new",
     },
   ];
 
@@ -236,6 +243,17 @@ const Sidebar = () => {
             >
               <Unplug className="mr-2 h-4 w-4" />
               <span>Integration</span>
+            </Button>
+          </li>
+          <li className="px-2">
+            <Button
+              className="w-full justify-start bg-transparent"
+              variant={"default"}
+              size={"sm"}
+              onClick={() => router.push("/office/warehouse")}
+            >
+              <Warehouse className="mr-2 h-4 w-4" />
+              <span>Warehouses</span>
             </Button>
           </li>
           <li className="px-2">
