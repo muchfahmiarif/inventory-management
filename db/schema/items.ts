@@ -49,6 +49,17 @@ export const itemGroups = pgTable("item_groups", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Variant attribute names of a group (e.g. Color, Size). Variant items that
+// carry these attributes are generated later (Phase 7 automation).
+export const itemGroupAttributes = pgTable("item_group_attributes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  groupId: uuid("group_id")
+    .notNull()
+    .references(() => itemGroups.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  sortOrder: text("sort_order"),
+});
+
 export const items = pgTable("items", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),

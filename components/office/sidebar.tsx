@@ -45,6 +45,16 @@ const Sidebar = () => {
       new: "/office/inventory/itemgroups/new",
     },
     {
+      name: "Composite Items",
+      href: "/office/inventory/composite-items",
+      new: "/office/inventory/composite-items/new",
+    },
+    {
+      name: "Price Lists",
+      href: "/office/inventory/price-lists",
+      new: "/office/inventory/price-lists/new",
+    },
+    {
       name: "Inventory Adjustments",
       href: "/office/inventory/adjustments",
       new: "/office/inventory/adjustments/new",
@@ -104,21 +114,34 @@ const Sidebar = () => {
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">
                 {inventoryLinks.map((link) => (
-                  <Link key={link.href} href={link.href}>
+                  <div key={link.href} className="group flex w-full">
                     <Button
                       className={cn(
-                        pathname == link.href ? "bg-primary" : "bg-transparent",
-                        "group w-full justify-between text-wrap ps-9 text-start",
+                        pathname === link.href ? "bg-primary" : "bg-transparent",
+                        "flex-1 justify-start text-wrap ps-9 text-start",
                       )}
                       variant={"default"}
                       size={"sm"}
+                      asChild
                     >
-                      <span>{link.name}</span>
-                      <Link href={link.new}>
-                        <CirclePlus className="ml-2 hidden h-4 w-4 group-hover:block" />
+                      <Link href={link.href}>
+                        <span>{link.name}</span>
                       </Link>
                     </Button>
-                  </Link>
+                    <Button
+                      className={cn(
+                        pathname === link.href ? "bg-primary" : "bg-transparent",
+                        "px-2",
+                      )}
+                      variant={"default"}
+                      size={"sm"}
+                      asChild
+                    >
+                      <Link href={link.new} aria-label={`New ${link.name}`}>
+                        <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                      </Link>
+                    </Button>
+                  </div>
                 ))}
               </CollapsibleContent>
             </Collapsible>

@@ -116,18 +116,22 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
   `tableFeatures({...})` + `useTable({ features, ... })` and
   `columnVisibilityFeature` for `getVisibleCells`.
 
-## Phase 1 — Items domain
+## Phase 1 — Items domain (in progress — core done 2026-11-19)
 
-- [ ] **Items list**: real table (Item Name, Code, Purchase Price, Selling Price,
-      Stock on Hand, Unit, Status); 12 custom views (All/Active/Ungrouped/Low
-      Stock/Sales/Purchases/Inventory/Non-Inventory/Services/Inactive/Returned/
-      Non-Returned); filter dropdown; bulk actions; pagination. Replaces
-      `<div>test</div>`.
-- [ ] **New/Edit Item form** tabs: Item Details (name, type, SKU, unit, brand,
-      category, description); Buy Info (vendor, cost price, opening stock +
-      warehouse + reorder level); Sell Info (selling price, wholesale, tax).
-- [ ] **Item detail page**: Overview (info cards + stock), Transactions tab,
-      History tab; header actions (Edit/Delete/Copy).
+- [x] **Items list**: real table (Item Name, Code, Item Group, Purchase Price,
+      Selling Price, Stock on Hand, Status); 12 custom views via `?view=`;
+      bulk actions (Activate/Deactivate/Delete); pagination; grid view.
+      Replaces `<div>test</div>`.
+- [x] **New/Edit Item form** sections: Item Details (name, type, SKU
+      auto-generate via numbering series, unit, brand, category, group,
+      description); Buy Info (preferred vendor, cost price, opening stock +
+      warehouse, reorder level); Sell Info (selling price, wholesale, tax).
+- [x] **Item detail page**: Overview (stock summary + info cards), Transactions
+      tab (ledger w/ running balance), History tab (activity log); header
+      actions (Edit, Mark Inactive/Active, AlertDialog Delete).
+- [x] **Verified E2E in browser**: form create → ITEM-00001 auto-number →
+      opening-stock ledger row (+15, balance 15) → redirect to detail → row on
+      list page with red low-stock highlighting.
 - [ ] **Item Groups**: list (name, # items, description) + New form (name, variant
       attributes, description) + detail.
 - [ ] **Composite Items**: list + form (component item picker + qty per component,
@@ -136,8 +140,6 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
       detail.
 - [ ] Sidebar Inventory section fully live; option-card CTA buttons link to the
       four modules.
-- [ ] Verify: create item → appears in list + correct custom views; stock-on-hand
-      from ledger.
 
 ## Phase 2 — Stock operations
 

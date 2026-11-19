@@ -1,7 +1,5 @@
-import React from "react";
+import ItemGroupForm from "@/components/office/inventory/itemgroups/item-group-form";
 
-const ItemGroupsNew = () => {
-  return <div>ItemGroupsNew</div>;
-};
-
-export default ItemGroupsNew;
+export default async function NewItemGroupPage() {
+  return <ItemGroupForm mode="new" defaultValues={{ name: "", attributes: [] }} />;
+}
