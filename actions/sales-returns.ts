@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { salesReturnLines, salesReturns, stockMovements } from "@/db/schema";
+import { items, salesReturnLines, salesReturns, stockMovements } from "@/db/schema";
 import { logActivity } from "@/lib/activity";
 import { nextNumber } from "@/lib/numbering";
 import {
@@ -25,11 +25,17 @@ export async function createSalesReturn(input: SalesReturnFormInput) {
 
   const id = await db.transaction(async (tx) => {
     const number = await nextNumber(tx, "sales_returns");
+    const itemRows = await tx
+      .select({ id: items.id, name: items.name })
+      .from(items)
+      .where(inArray(items.id, data.lines.map((l) => l.itemId)));
+    const nameById = new Map(itemRows.map((i) => [i.id, i.name]));
+
     let subtotal = 0;
     const lines = data.lines.map((l) => {
       const amount = Math.round(l.quantity * l.rate * 100) / 100;
       subtotal += amount;
-      return { ...l, amount };
+      return { ...l, name: nameById.get(l.itemId) ?? "Item", amount };
     });
 
     const [ret] = await tx
@@ -53,6 +59,7 @@ export async function createSalesReturn(input: SalesReturnFormInput) {
       lines.map((l) => ({
         salesReturnId: ret.id,
         itemId: l.itemId,
+        name: l.name,
         quantity: l.quantity,
         rate: l.rate,
         amount: l.amount,
