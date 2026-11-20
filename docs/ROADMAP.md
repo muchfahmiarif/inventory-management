@@ -171,9 +171,12 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
       Balance Due; **Record Payment dialog** (amount/mode/date) →
       customer_payments row + status Partially Paid/Paid; Void.
 - [ ] Packages, Shipments, Deliver Challans, Credit Notes, Sales Returns.
+- [x] **Vendors** (Phase 4 opener): full module reusing contacts views at
+      `/office/purchases/vendors`.
 - [ ] Customer Payments standalone list.
 - [ ] Convert actions (Estimate→SO→Invoice) — statuses exist, convert buttons pending.
-- [ ] Dashboard "Sales Activity" counts real records.
+- [x] Dashboard "Sales Activity" + "Inventory Summary" count real records
+      (lib/dashboard.ts: SO statuses + stock ledger sum).
 - [ ] Verify: payment flips invoice to Paid (code path done, UI dialog test pending).
 
 ## Phase 4 — Purchases

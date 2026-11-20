@@ -4,7 +4,12 @@ import { Separator } from "@/components/ui/separator";
 import { Check, Ellipsis, FileText, Package } from "lucide-react";
 import React from "react";
 
-const DashboardPage = () => {
+import { getDashboardStats } from "@/lib/dashboard";
+import { formatQty } from "@/lib/format";
+
+const DashboardPage = async () => {
+  const stats = await getDashboardStats();
+
   return (
     <div className="flex h-[200rem] flex-col items-center bg-primary-foreground">
       {/* TODO: CREATE FUNCTION DISABLE BANNER IF PAYMENT METHOD ALREADY SET */}
@@ -23,7 +28,7 @@ const DashboardPage = () => {
                 size={"default"}
                 className="mx-4 flex flex-col p-10"
               >
-                <h5 className="text-4xl text-blue-500">0</h5>
+                <h5 className="text-4xl text-blue-500">{stats.toBePacked}</h5>
                 <p className="text-xs text-muted-foreground/60">Qty</p>
               </Button>
               <div className="flex flex-row gap-x-2 text-xs uppercase tracking-wider text-muted-foreground">
@@ -40,7 +45,7 @@ const DashboardPage = () => {
                 size={"default"}
                 className="mx-4 flex flex-col p-10"
               >
-                <h5 className="text-4xl text-red-500">0</h5>
+                <h5 className="text-4xl text-red-500">{stats.toBeShipped}</h5>
                 <p className="text-xs text-muted-foreground/60">Pkgs</p>
               </Button>
               <div className="flex flex-row gap-x-2 text-xs uppercase tracking-wider text-muted-foreground">
@@ -57,7 +62,7 @@ const DashboardPage = () => {
                 size={"default"}
                 className="mx-4 flex flex-col p-10"
               >
-                <h5 className="text-4xl text-green-500">0</h5>
+                <h5 className="text-4xl text-green-500">{stats.toBeDelivered}</h5>
                 <p className="text-xs text-muted-foreground/60">Pkgs</p>
               </Button>
               <div className="flex flex-row gap-x-2 text-xs uppercase tracking-wider text-muted-foreground">
@@ -74,7 +79,7 @@ const DashboardPage = () => {
                 size={"default"}
                 className="mx-4 flex flex-col p-10"
               >
-                <h5 className="text-4xl text-yellow-500">0</h5>
+                <h5 className="text-4xl text-yellow-500">{stats.toBeInvoiced}</h5>
                 <p className="text-xs text-muted-foreground/60">Qty</p>
               </Button>
               <div className="flex flex-row gap-x-2 text-xs uppercase tracking-wider text-muted-foreground">
@@ -97,7 +102,7 @@ const DashboardPage = () => {
                 Quantity in hand
               </p>
               <p className="flex items-center justify-center text-center text-lg">
-                0
+                {formatQty(stats.quantityInHand)}
               </p>
             </div>
             <Separator />
@@ -106,7 +111,7 @@ const DashboardPage = () => {
                 Quantity to be received
               </p>
               <p className="flex items-center justify-center text-center text-lg">
-                0
+                {formatQty(stats.quantityToBeReceived)}
               </p>
             </div>
           </div>
