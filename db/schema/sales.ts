@@ -11,6 +11,7 @@ import {
 import { contacts } from "./contacts";
 import { items } from "./items";
 import { taxes } from "./settings";
+import { warehouses as warehousesTable } from "./warehouses";
 
 export const estimateStatusEnum = pgEnum("estimate_status", [
   "draft",
@@ -232,6 +233,8 @@ export const creditNoteLines = pgTable("credit_note_lines", {
 
 export const salesReturns = pgTable("sales_returns", {
   ...headerFields("sales_returns_number"),
+  // Where the returned goods go back into stock
+  warehouseId: uuid("warehouse_id").references(() => warehousesTable.id),
   invoiceId: uuid("invoice_id").references(() => invoices.id),
   status: salesReturnStatusEnum("status").notNull().default("draft"),
 });
