@@ -156,28 +156,25 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
 - [ ] **Stock Counts**: list; New (warehouse, items with system vs counted qty);
       on complete generates adjustment.
 
-## Phase 3 — Sales
+## Phase 3 — Sales (in progress — core done 2026-11-20)
 
-- [ ] **Customers**: list; New/Edit contact form (Contact Details / Address /
-      Other Details tabs); detail page with transactions tab.
-- [ ] **Estimates**: list; New form (customer, line items, taxes, discounts,
-      notes); statuses Draft→Sent→Viewed→Accepted/Declined/Expired; convert to SO
-      or Invoice.
-- [ ] **Sales Orders**: list; form; workflow Draft→Confirmed→Packed→Shipped→
-      Invoiced (+ Cancelled); actions Create Package / Create Shipment / Create
-      Invoice.
-- [ ] **Packages**: list; New package from SO (select items/qty); statuses.
-- [ ] **Shipments**: list; New (courier, tracking #); mark delivered.
-- [ ] **Deliver Challans**: list + form + convert.
-- [ ] **Invoices**: list (Draft/Sent/Partially Paid/Paid/Overdue); form from SO or
-      standalone; Record Payment inline; credit notes from invoice.
-- [ ] **Customer Payments**: list + Record Payment form (customer, invoice select,
-      amount, mode).
-- [ ] **Credit Notes**: list + form (from invoice/return); apply to invoice.
-- [ ] **Sales Returns**: list + form.
+- [x] **Customers**: list; New/Edit contact form (Contact Details / Billing +
+      Shipping Address / Other Details); detail page w/ tabs. Vendors reuse the
+      same contacts actions (Phase 4).
+- [x] **Estimates**: EST-#### list w/ row status actions; New/Edit form (customer,
+      line items w/ auto-pricing + discount + PPN tax, live totals, notes/terms);
+      statuses Draft→Sent→Viewed→Accepted/Declined/Expired. Verified E2E:
+      EST-00001, 2 lines w/ tax, total Rp 14.443.890.
+- [x] **Sales Orders**: SO-#### list; same transaction form; statuses
+      Draft→Confirmed→Packed→Shipped→Invoiced→Fulfilled (+Cancelled).
+- [x] **Invoices**: INV-#### list; form w/ due date; detail w/ Amount Paid +
+      Balance Due; **Record Payment dialog** (amount/mode/date) →
+      customer_payments row + status Partially Paid/Paid; Void.
+- [ ] Packages, Shipments, Deliver Challans, Credit Notes, Sales Returns.
+- [ ] Customer Payments standalone list.
+- [ ] Convert actions (Estimate→SO→Invoice) — statuses exist, convert buttons pending.
 - [ ] Dashboard "Sales Activity" counts real records.
-- [ ] Verify: SO→Package→Shipment→Invoice chain updates statuses; payment flips
-      invoice to Paid.
+- [ ] Verify: payment flips invoice to Paid (code path done, UI dialog test pending).
 
 ## Phase 4 — Purchases
 

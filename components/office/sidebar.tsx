@@ -207,15 +207,21 @@ const Sidebar = () => {
                     className="flex-1 justify-start bg-transparent ps-9"
                     variant={"default"}
                     size={"sm"}
+                    asChild
                   >
-                    <span>Estimates</span>
+                    <Link href="/office/sales/estimates">
+                      <span>Estimates</span>
+                    </Link>
                   </Button>
                   <Button
                     className="bg-transparent px-2"
                     variant={"default"}
                     size={"sm"}
+                    asChild
                   >
-                    <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                    <Link href="/office/sales/estimates/new" aria-label="New Estimate">
+                      <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                    </Link>
                   </Button>
                 </div>
                 <div className="group flex w-full">
@@ -223,15 +229,43 @@ const Sidebar = () => {
                     className="flex-1 justify-start bg-transparent ps-9"
                     variant={"default"}
                     size={"sm"}
+                    asChild
                   >
-                    <span>Invoices</span>
+                    <Link href="/office/sales/sales-orders">
+                      <span>Sales Orders</span>
+                    </Link>
                   </Button>
                   <Button
                     className="bg-transparent px-2"
                     variant={"default"}
                     size={"sm"}
+                    asChild
                   >
-                    <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                    <Link href="/office/sales/sales-orders/new" aria-label="New Sales Order">
+                      <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                    </Link>
+                  </Button>
+                </div>
+                <div className="group flex w-full">
+                  <Button
+                    className="flex-1 justify-start bg-transparent ps-9"
+                    variant={"default"}
+                    size={"sm"}
+                    asChild
+                  >
+                    <Link href="/office/sales/invoices">
+                      <span>Invoices</span>
+                    </Link>
+                  </Button>
+                  <Button
+                    className="bg-transparent px-2"
+                    variant={"default"}
+                    size={"sm"}
+                    asChild
+                  >
+                    <Link href="/office/sales/invoices/new" aria-label="New Invoice">
+                      <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                    </Link>
                   </Button>
                 </div>
               </CollapsibleContent>
