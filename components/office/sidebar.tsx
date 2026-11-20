@@ -291,6 +291,19 @@ const Sidebar = () => {
                     </Link>
                   </Button>
                 </div>
+
+                <div className="group flex w-full">
+                  <Button
+                    className="flex-1 justify-start bg-transparent ps-9"
+                    variant={"default"}
+                    size={"sm"}
+                    asChild
+                  >
+                    <Link href="/office/sales/customer-payments">
+                      <span>Customer Payments</span>
+                    </Link>
+                  </Button>
+                </div>
               </CollapsibleContent>
             </Collapsible>
           </li>
