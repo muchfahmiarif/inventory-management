@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 import { ContactsList } from "@/components/office/contacts/contact-views";
 import { db } from "@/db";

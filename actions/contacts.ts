@@ -8,7 +8,6 @@ import { z } from "zod";
 import { db } from "@/db";
 import { contacts } from "@/db/schema";
 import { logActivity } from "@/lib/activity";
-import { nextNumber } from "@/lib/numbering";
 import { contactFormSchema, type ContactFormInput } from "@/lib/schemas/contacts";
 
 type ContactType = "customer" | "vendor";
