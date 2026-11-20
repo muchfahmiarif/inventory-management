@@ -170,7 +170,15 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
 - [x] **Invoices**: INV-#### list; form w/ due date; detail w/ Amount Paid +
       Balance Due; **Record Payment dialog** (amount/mode/date) →
       customer_payments row + status Partially Paid/Paid; Void.
-- [ ] Packages, Shipments, Deliver Challans, Credit Notes, Sales Returns.
+- [x] **Deliver Challans** (DC-####): list/form/detail, statuses
+      Draft→Sent→Invoiced→Cancelled.
+- [x] **Credit Notes** (CN-####): list/form/detail, Open/Closed/Void.
+- [x] **Sales Returns** (SR-####): list/form/detail; Mark as Received writes
+      stock-in movements; delete reverses received stock.
+- [x] **Customer Payments** standalone list (PM-#### records from invoice
+      payments).
+- [ ] Packages, Shipments, Sales Returns stock movements done; Packages +
+      Shipments modules themselves pending (SO→Package→Shipment chain).
 - [x] **Vendors** (Phase 4 opener): full module reusing contacts views at
       `/office/purchases/vendors`.
 - [ ] Customer Payments standalone list.
