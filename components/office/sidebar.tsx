@@ -268,6 +268,29 @@ const Sidebar = () => {
                     </Link>
                   </Button>
                 </div>
+
+                <div className="group flex w-full">
+                  <Button
+                    className="flex-1 justify-start bg-transparent ps-9"
+                    variant={"default"}
+                    size={"sm"}
+                    asChild
+                  >
+                    <Link href="/office/sales/deliver-challans">
+                      <span>Deliver Challans</span>
+                    </Link>
+                  </Button>
+                  <Button
+                    className="bg-transparent px-2"
+                    variant={"default"}
+                    size={"sm"}
+                    asChild
+                  >
+                    <Link href="/office/sales/deliver-challans/new" aria-label="New Deliver Challan">
+                      <CirclePlus className="hidden h-4 w-4 group-hover:block" />
+                    </Link>
+                  </Button>
+                </div>
               </CollapsibleContent>
             </Collapsible>
           </li>
