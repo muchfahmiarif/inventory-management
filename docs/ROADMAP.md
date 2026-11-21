@@ -192,15 +192,20 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
       (lib/dashboard.ts: SO statuses + stock ledger sum).
 - [x] Verified: payment flips invoice to Paid via UI dialog (INV-00001 → Paid).
 
-## Phase 4 — Purchases
+## Phase 4 — Purchases ✅ (2026-11-21)
 
 - [x] **Vendors** (mirror customers).
-- [ ] **Expenses**: list + form (category, vendor, amount, billable).
-- [ ] **Purchase Orders**: list + form (vendor, lines); Receive Items → stock in;
-      status flow.
-- [ ] **Bills**: list + form (from PO or standalone); Record Payment.
-- [ ] **Vendor Payments**: list + record form.
-- [ ] **Debit Notes**: list + form (from bill).
+- [x] **Expenses**: list + form (category, vendor, amount); expense categories
+      seeded.
+- [x] **Purchase Orders**: PO-#### list + form (vendor, deliver-to warehouse,
+      lines); **Receive Items → stock-in movements** into the PO warehouse;
+      status flow Draft→Open→Received→Billed (+Cancelled).
+- [x] **Bills**: BILL-#### list + form (from PO reference); detail w/ Amount
+      Paid + Balance Due; Record Payment → vendor_payments + Partially Paid/Paid.
+- [x] **Vendor Payments**: standalone list (VP-#### records from bill payments).
+- [x] **Debit Notes**: DN-#### list + form (from vendor), Open/Closed/Void.
+- [x] Verified E2E: PO created via form → Receive Items → +2 stock movement in
+      ledger, status Received.
 
 ## Phase 5 — Home, Reports, Documents
 

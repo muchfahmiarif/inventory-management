@@ -44,6 +44,7 @@ export interface TransactionLineValues {
 export interface TransactionFormValues {
   date: string;
   contactId: string;
+  warehouseId?: string;
   reference?: string;
   expiryDate?: string;
   notes?: string;
@@ -71,6 +72,8 @@ interface TransactionFormProps {
   // Optional extra date field, e.g. "Expiry Date" / "Expected Shipment"
   extraDateLabel?: string;
   extraDateKey?: "expiryDate";
+  // Purchase orders: delivery warehouse for Receive Items stock-in
+  warehouse?: { label: string; options: { id: string; name: string }[] };
 }
 
 // Shared transaction form (Zoho-style): header fields + line-item table with
@@ -85,6 +88,7 @@ const TransactionForm = ({
   submitAction,
   extraDateLabel,
   extraDateKey,
+  warehouse,
 }: TransactionFormProps) => {
   const form = useForm<TransactionFormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -203,6 +207,32 @@ const TransactionForm = ({
                 </FormItem>
               )}
             />
+            {warehouse && (
+              <FormField
+                control={form.control}
+                name="warehouseId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{warehouse.label}</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value ?? "none"}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select warehouse" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {warehouse.options.map((o) => (
+                          <SelectItem key={o.id} value={o.id}>
+                            {o.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </div>
 
           <div className="rounded-md border">

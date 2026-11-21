@@ -180,6 +180,11 @@ const Sidebar = () => {
 
   const purchaseLinks: SidebarLink[] = [
     { name: "Vendors", href: "/office/purchases/vendors", new: "/office/purchases/vendors/new" },
+    { name: "Expenses", href: "/office/purchases/expenses", new: "/office/purchases/expenses/new" },
+    { name: "Purchase Orders", href: "/office/purchases/purchase-orders", new: "/office/purchases/purchase-orders/new" },
+    { name: "Bills", href: "/office/purchases/bills", new: "/office/purchases/bills/new" },
+    { name: "Vendor Payments", href: "/office/purchases/vendor-payments" },
+    { name: "Debit Notes", href: "/office/purchases/debit-notes", new: "/office/purchases/debit-notes/new" },
   ];
 
   return (

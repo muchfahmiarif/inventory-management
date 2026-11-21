@@ -10,6 +10,8 @@ const optionalNumber = z.preprocess(
 export const transactionFormSchema = z.object({
   date: z.string().min(1, "Date is required"),
   contactId: z.string().min(1, "Select a customer"),
+  // Purchase orders only: delivery warehouse for Receive Items stock-in
+  warehouseId: z.string().optional(),
   reference: z.string().optional(),
   expiryDate: z.string().optional(),
   notes: z.string().optional(),

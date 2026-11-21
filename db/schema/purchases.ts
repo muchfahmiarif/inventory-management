@@ -11,6 +11,7 @@ import {
 import { contacts } from "./contacts";
 import { items } from "./items";
 import { taxes } from "./settings";
+import { warehouses as warehousesTable } from "./warehouses";
 
 export const poStatusEnum = pgEnum("po_status", [
   "draft",
@@ -90,6 +91,8 @@ const headerFields = (numberConstraint: string) => ({
 export const purchaseOrders = pgTable("purchase_orders", {
   ...headerFields("purchase_orders_number"),
   expectedDeliveryDate: date("expected_delivery_date"),
+  // Warehouse goods are delivered into (used by Receive Items stock-in)
+  warehouseId: uuid("warehouse_id").references(() => warehousesTable.id),
   status: poStatusEnum("status").notNull().default("draft"),
 });
 
