@@ -64,3 +64,16 @@ export const orgFlags = pgTable("org_flags", {
   key: text("key").notNull().unique(),
   value: boolean("value").notNull().default(false),
 });
+
+// Per-record file attachments (Phase 5 Documents); files live in .data/uploads/
+export const documents = pgTable("documents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  fileName: text("file_name").notNull(),
+  storedName: text("stored_name").notNull(),
+  mimeType: text("mime_type"),
+  sizeBytes: integer("size_bytes").notNull().default(0),
+  entityType: text("entity_type").notNull(), // e.g. "item", "contact", "invoice"
+  entityId: uuid("entity_id"),
+  entityLabel: text("entity_label"),
+  uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
+});

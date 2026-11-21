@@ -272,24 +272,52 @@ const Sidebar = () => {
               </Link>
             </Button>
           </li>
-          <li className="px-2">
+          <li className="relative px-2">
+            {pathname.startsWith("/office/reports") && (
+              <ActiveRail className="left-2" />
+            )}
             <Button
-              className="w-full justify-start bg-transparent hover:bg-sidebar-accent"
+              className={cn(
+                "w-full justify-start hover:bg-sidebar-accent",
+                pathname.startsWith("/office/reports")
+                  ? "bg-sidebar-accent font-medium"
+                  : "bg-transparent",
+              )}
               variant={"default"}
               size={"sm"}
+              asChild
             >
-              <NotepadText className="mr-2 h-4 w-4" />
-              <span>Reports</span>
+              <Link
+                href="/office/reports"
+                aria-current={pathname.startsWith("/office/reports") ? "page" : undefined}
+              >
+                <NotepadText className="mr-2 h-4 w-4" />
+                <span>Reports</span>
+              </Link>
             </Button>
           </li>
-          <li className="px-2">
+          <li className="relative px-2">
+            {pathname.startsWith("/office/documents") && (
+              <ActiveRail className="left-2" />
+            )}
             <Button
-              className="w-full justify-start bg-transparent hover:bg-sidebar-accent"
+              className={cn(
+                "w-full justify-start hover:bg-sidebar-accent",
+                pathname.startsWith("/office/documents")
+                  ? "bg-sidebar-accent font-medium"
+                  : "bg-transparent",
+              )}
               variant={"default"}
               size={"sm"}
+              asChild
             >
-              <BookCheck className="mr-2 h-4 w-4" />
-              <span>Documents</span>
+              <Link
+                href="/office/documents"
+                aria-current={pathname.startsWith("/office/documents") ? "page" : undefined}
+              >
+                <BookCheck className="mr-2 h-4 w-4" />
+                <span>Documents</span>
+              </Link>
             </Button>
           </li>
         </ul>

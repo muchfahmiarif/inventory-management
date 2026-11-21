@@ -207,18 +207,19 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
 - [x] Verified E2E: PO created via form → Receive Items → +2 stock movement in
       ledger, status Received.
 
-## Phase 5 — Home, Reports, Documents
+## Phase 5 — Home, Reports, Documents ✅ (2026-11-21)
 
-- [ ] **Getting Started**: checklist cards + progress (add first item, first
-      customer, first invoice, complete org profile, invite user) driven by real
-      data.
-- [ ] **Recent Updates**: activity_log feed. **Announcements** page.
-- [ ] **Reports**: index grouped (Inventory: Stock Summary / Valuation / History /
-      Low Stock; Sales: by Customer / by Item; Purchases: by Vendor / by Item;
-      Payments) — filterable tables + CSV export.
-- [ ] **Documents**: per-record attachments (local fs `.data/uploads/`, list +
-      upload UI).
-- [ ] Record History tabs populated from `activity_log` via server actions.
+- [x] **Getting Started**: 5-step checklist + progress bar driven by real data
+      (items/customers/POs/invoices counts + org profile completeness).
+- [x] **Recent Updates**: activity_log feed (100 latest). **Announcements** page
+      with static cards.
+- [x] **Reports**: index grouped by domain (Inventory / Sales / Purchases) with
+      config-driven report pages — Stock Summary (per warehouse), Inventory
+      Valuation, Low Stock, Sales by Customer, Sales by Item, Purchases by
+      Vendor — plus client-side CSV export.
+- [x] **Documents**: upload (FormData server action → `.data/uploads/`), list w/
+      size + type, download API route, delete.
+- [x] Record History tabs from activity_log (items/groups done in Phase 1).
 
 ## Phase 6 — Settings & org
 
