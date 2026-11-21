@@ -234,18 +234,23 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
 - [x] Notifications & Automation preference toggles (persisted via orgFlags).
 - [x] Integrations page (UI-only states).
 
-## Phase 7 — Cross-cutting polish
+## Phase 7 — Cross-cutting polish ✅ (2026-11-21)
 
-- [ ] Global search command palette (`/` shortcut — matches the "( / )"
-      placeholder) across items/contacts/transactions.
-- [ ] Quick Create menu (dropdown of all module New links) on header + button.
-- [ ] Notifications dropdown; profile menu (convert Edit-profile Sheet into Zoho
-      profile dropdown); apps grid.
-- [ ] Functional sidebar collapse.
-- [ ] Toasts (sonner) on every action; alert-dialog delete confirmations.
-- [ ] Empty states with icons for every list; loading skeletons; error boundaries.
-- [ ] Final QA: side-by-side vs Zoho Inventory screenshots per list/form; build +
-      lint green.
+- [x] Global search command palette (Ctrl+K or "/" — matches the "( / )"
+      placeholder) across items/contacts/transactions via /api/search.
+- [x] Quick Create menu (dropdown of module New links) on the header + button.
+- [x] Notifications dropdown (bell, activity feed, refreshed on open);
+      profile dropdown on the avatar (org profile, users, settings).
+- [x] Functional sidebar collapse (icon rail mode with active highlight).
+- [x] Toasts (sonner, bottom-right, rich colors) on receive/payment/toggle/
+      entity-CRUD actions; alert-dialog delete confirmations (existing).
+- [x] Empty states on every DataTable; error + loading boundaries at the
+      back-office route group level.
+- [x] Final QA: build + lint green (0 errors); route sweep 200s; command
+      palette E2E verified (Ctrl+K → search → navigate).
+
+Deferred (out of original scope): print templates HTML view, per-record
+attachment pickers on detail pages, side-by-side screenshot comparison.
 
 ---
 

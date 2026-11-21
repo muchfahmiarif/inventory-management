@@ -12,6 +12,10 @@ interface SearchInputProps {
 const SearchInput = ({ children, value, className }: SearchInputProps) => {
   const [inputValue, setInputValue] = React.useState<string>("");
 
+  const openPalette = () => {
+    window.dispatchEvent(new CustomEvent("open-command-palette"));
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -36,6 +40,7 @@ const SearchInput = ({ children, value, className }: SearchInputProps) => {
           className="block w-full rounded-lg border p-2 ps-10 text-sm hover:border-primary focus-visible:border focus-visible:border-primary focus-visible:outline-none"
           placeholder="Search in Customers ( / )"
           autoComplete="off"
+          onFocus={openPalette}
           onChange={handleInputChange}
           value={value || inputValue}
         />

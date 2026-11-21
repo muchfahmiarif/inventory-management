@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
+import { toast } from "sonner";
+
 import {
   deleteSalesReturn,
   deleteSalesReturns,
@@ -167,7 +169,13 @@ function SalesReturnDetail({ data }: { data: SalesReturnDetailData }) {
       <div className="mt-4 flex flex-col gap-4">
         <div className="flex items-center gap-2">
           {data.status === "draft" && (
-            <Button size="sm" onClick={() => markSalesReturnReceived(data.id)}>
+            <Button
+              size="sm"
+              onClick={async () => {
+                await markSalesReturnReceived(data.id);
+                toast.success("Return received — stock updated");
+              }}
+            >
               Mark as Received
             </Button>
           )}

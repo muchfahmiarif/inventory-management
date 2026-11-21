@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
+import { toast } from "sonner";
+
 import {
   deletePurchaseOrder,
   deletePurchaseOrders,
@@ -237,7 +239,13 @@ function PurchaseOrderDetail({ data }: { data: PurchaseOrderDetailData }) {
       <div className="mt-4 flex flex-col gap-4">
         {receivable && (
           <div className="flex items-center gap-2">
-            <Button size="sm" onClick={() => receivePurchaseOrderItems(data.id)}>
+            <Button
+              size="sm"
+              onClick={async () => {
+                await receivePurchaseOrderItems(data.id);
+                toast.success("Items received — stock updated");
+              }}
+            >
               <PackageCheck className="mr-1 h-4 w-4" /> Receive Items
             </Button>
             <span className="text-sm text-muted-foreground">

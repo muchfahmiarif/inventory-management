@@ -143,6 +143,7 @@ const NavSection = ({
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = React.useState(false);
 
   // Auto-expand the section containing the current route
   const [isPurchasesOpen, setIsPurchasesOpen] = React.useState(
@@ -186,6 +187,14 @@ const Sidebar = () => {
     { name: "Vendor Payments", href: "/office/purchases/vendor-payments" },
     { name: "Debit Notes", href: "/office/purchases/debit-notes", new: "/office/purchases/debit-notes/new" },
   ];
+
+  if (collapsed) {
+    return (
+      <CollapsedSidebar
+        onExpand={() => setCollapsed(false)}
+      />
+    );
+  }
 
   return (
     <div className="sticky top-0 flex h-screen w-[12.5rem] flex-col justify-between bg-sidebar text-sidebar-foreground">
@@ -343,12 +352,67 @@ const Sidebar = () => {
             </Button>
           </div>
         </div>
-        <Button variant={"ghost"} size={"icon"}>
+        <Button
+          variant={"ghost"}
+          size={"icon"}
+          aria-label="Collapse sidebar"
+          onClick={() => setCollapsed(true)}
+        >
           <ChevronLeft />
         </Button>
       </div>
     </div>
   );
 };
+
+// Icon-only rail shown when the sidebar is collapsed
+function CollapsedSidebar({ onExpand }: { onExpand: () => void }) {
+  const pathname = usePathname();
+  const rail: Array<{ icon: React.ElementType; href: string; label: string }> = [
+    { icon: Home, href: "/office/home", label: "Home" },
+    { icon: ShoppingBasket, href: "/office/inventory/items", label: "Inventory" },
+    { icon: DollarSign, href: "/office/sales/customers", label: "Sales" },
+    { icon: ShoppingBag, href: "/office/purchases/vendors", label: "Purchases" },
+    { icon: Warehouse, href: "/office/warehouse", label: "Warehouses" },
+    { icon: NotepadText, href: "/office/reports", label: "Reports" },
+    { icon: BookCheck, href: "/office/documents", label: "Documents" },
+  ];
+
+  return (
+    <div className="sticky top-0 flex h-screen w-14 flex-col items-center justify-between bg-sidebar text-sidebar-foreground">
+      <div className="flex w-full flex-col items-center gap-y-2 pt-3">
+        <Button className="rounded-none bg-sidebar-accent py-4 hover:bg-sidebar-accent">
+          <ShoppingCart />
+        </Button>
+        {rail.map(({ icon: Icon, href, label }) => {
+          const active = pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-label={label}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-md hover:bg-sidebar-accent",
+                active ? "bg-primary text-primary-foreground" : "text-sidebar-foreground",
+              )}
+            >
+              <Icon className="h-4 w-4" />
+            </Link>
+          );
+        })}
+        <Button
+          variant={"ghost"}
+          size={"icon"}
+          aria-label="Expand sidebar"
+          className="mt-auto"
+          onClick={onExpand}
+        >
+          <ChevronRight />
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export default Sidebar;

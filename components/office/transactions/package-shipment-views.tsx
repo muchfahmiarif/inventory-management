@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle2, Send, Truck } from "lucide-react";
+import { toast } from "sonner";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -414,7 +415,13 @@ function ShipmentDetail({ data }: { data: ShipmentDetailData }) {
       <div className="mt-4 flex flex-col gap-4">
         <div className="flex items-center gap-2">
           {data.status === "shipped" && (
-            <Button size="sm" onClick={() => markShipmentDelivered(data.id)}>
+            <Button
+              size="sm"
+              onClick={async () => {
+                await markShipmentDelivered(data.id);
+                toast.success("Shipment delivered");
+              }}
+            >
               <CheckCircle2 className="mr-1 h-4 w-4" /> Mark as Delivered
             </Button>
           )}

@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 
+import { toast } from "sonner";
+
 import { setOrgFlag } from "@/actions/settings";
 import { Switch } from "@/components/ui/switch";
 
@@ -30,6 +32,7 @@ export function PreferencesClient({ flags }: { flags: FlagRow[] }) {
   const toggle = async (key: string, value: boolean) => {
     setState((s) => ({ ...s, [key]: value }));
     await setOrgFlag(key, value);
+    toast.success("Preference saved");
     router.refresh();
   };
 

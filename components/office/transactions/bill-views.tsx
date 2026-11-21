@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
+import { toast } from "sonner";
+
 import { deleteBill, recordBillPayment } from "@/actions/bills";
 import DetailPageShell from "@/components/shared/detail-page";
 import DataTable, {
@@ -203,6 +205,7 @@ function BillDetail({ data }: { data: BillDetailData }) {
       date: payDate,
     });
     setPayOpen(false);
+    toast.success("Payment recorded");
     router.refresh();
   };
 

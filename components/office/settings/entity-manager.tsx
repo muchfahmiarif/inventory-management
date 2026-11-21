@@ -1,6 +1,7 @@
 "use client";
 
 import { Pencil, Plus, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -103,6 +104,11 @@ export function EntityManager({
         return;
       }
       setShowForm(false);
+      toast.success(
+        editingId === null
+          ? `${config.entityLabel} created`
+          : `${config.entityLabel} updated`,
+      );
       router.refresh();
     } finally {
       setSaving(false);
