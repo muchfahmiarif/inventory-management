@@ -83,10 +83,6 @@ const PackageForm = ({
   return (
     <PageFormShell title={`New Package — ${soNumber}`} formId={FORM_ID}>
       <Form {...form}>
-        {/* TEMP DEBUG */}
-        <pre data-testid="debug-errors" className="text-xs text-red-500">
-          {JSON.stringify(form.formState.errors, null, 2)}
-        </pre>
         <form
           id={FORM_ID}
           onSubmit={form.handleSubmit(onSubmit)}
