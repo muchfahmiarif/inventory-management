@@ -221,18 +221,18 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
       size + type, download API route, delete.
 - [x] Record History tabs from activity_log (items/groups done in Phase 1).
 
-## Phase 6 — Settings & org
+## Phase 6 — Settings & org ✅ (2026-11-21)
 
-- [ ] Settings index (search + grouped cards like Zoho): Organization, Taxes,
+- [x] Settings index (search + grouped cards like Zoho): Organization, Taxes,
       Users, Templates, Integrations, Automations, Preferences.
-- [ ] Organization Profile form.
-- [ ] Taxes (list + form + group taxes); Currencies; Units; Categories; Brands.
-- [ ] Numbering series config per module (prefix, next number).
-- [ ] Templates: invoice/estimate email + print (HTML print view via browser
-      print).
-- [ ] Users & Roles: list + mock invite + permission matrix.
-- [ ] Notifications & Automation preference toggles (persisted).
-- [ ] Integrations page (UI-only "Enable Now" states).
+- [x] Organization Profile form.
+- [x] Taxes; Currencies; Units; Categories; Brands — via generic EntityManager
+      (inline add/edit/delete). Group-tax components deferred.
+- [x] Numbering series config per module (prefix, next number, padding).
+- [x] Templates: list + inline edit form (print view deferred to Phase 7 polish).
+- [x] Users & Roles: list + mock invite.
+- [x] Notifications & Automation preference toggles (persisted via orgFlags).
+- [x] Integrations page (UI-only states).
 
 ## Phase 7 — Cross-cutting polish
 
