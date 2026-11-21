@@ -6,7 +6,16 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { estimateLines, estimates, items, taxes } from "@/db/schema";
+import {
+  estimateLines,
+  estimates,
+  invoices,
+  invoiceLines,
+  items,
+  salesOrderLines,
+  salesOrders,
+  taxes,
+} from "@/db/schema";
 import { logActivity } from "@/lib/activity";
 import { nextNumber } from "@/lib/numbering";
 import {
@@ -185,4 +194,130 @@ export async function deleteEstimates(ids: string[]) {
   if (!ids.length) return;
   await db.delete(estimates).where(inArray(estimates.id, ids));
   revalidatePath(PATH);
+}
+
+// Convert an estimate into a sales order (marks the estimate accepted)
+export async function createSalesOrderFromEstimate(estimateId: string) {
+  const [estimate] = await db
+    .select()
+    .from(estimates)
+    .where(eq(estimates.id, estimateId));
+  if (!estimate) throw new Error("Estimate not found");
+
+  const lines = await db
+    .select()
+    .from(estimateLines)
+    .where(eq(estimateLines.estimateId, estimateId));
+
+  const soId = await db.transaction(async (tx) => {
+    const number = await nextNumber(tx, "sales_orders");
+    const [so] = await tx
+      .insert(salesOrders)
+      .values({
+        number,
+        date: estimate.date,
+        contactId: estimate.contactId,
+        reference: estimate.number,
+        notes: estimate.notes,
+        terms: estimate.terms,
+        status: "confirmed",
+        subtotal: estimate.subtotal,
+        discountTotal: estimate.discountTotal,
+        taxTotal: estimate.taxTotal,
+        total: estimate.total,
+      })
+      .returning();
+
+    await tx.insert(salesOrderLines).values(
+      lines.map((l) => ({
+        salesOrderId: so.id,
+        itemId: l.itemId,
+        name: l.name,
+        description: l.description,
+        quantity: l.quantity,
+        rate: l.rate,
+        discountPercent: l.discountPercent,
+        taxId: l.taxId,
+        amount: l.amount,
+      })),
+    );
+
+    await tx
+      .update(estimates)
+      .set({ status: "accepted", updatedAt: new Date() })
+      .where(eq(estimates.id, estimateId));
+    return so.id;
+  });
+
+  await logActivity({
+    action: `converted estimate ${estimate.number} to sales order`,
+    entityType: "sales_order",
+    entityId: soId,
+  });
+
+  revalidatePath("/office/sales/estimates");
+  redirect("/office/sales/sales-orders");
+}
+
+// Convert an estimate directly into an invoice
+export async function createInvoiceFromEstimate(estimateId: string) {
+  const [estimate] = await db
+    .select()
+    .from(estimates)
+    .where(eq(estimates.id, estimateId));
+  if (!estimate) throw new Error("Estimate not found");
+
+  const lines = await db
+    .select()
+    .from(estimateLines)
+    .where(eq(estimateLines.estimateId, estimateId));
+
+  const invId = await db.transaction(async (tx) => {
+    const number = await nextNumber(tx, "invoices");
+    const [invoice] = await tx
+      .insert(invoices)
+      .values({
+        number,
+        date: estimate.date,
+        contactId: estimate.contactId,
+        reference: estimate.number,
+        notes: estimate.notes,
+        terms: estimate.terms,
+        status: "draft",
+        subtotal: estimate.subtotal,
+        discountTotal: estimate.discountTotal,
+        taxTotal: estimate.taxTotal,
+        total: estimate.total,
+      })
+      .returning();
+
+    await tx.insert(invoiceLines).values(
+      lines.map((l) => ({
+        invoiceId: invoice.id,
+        itemId: l.itemId,
+        name: l.name,
+        description: l.description,
+        quantity: l.quantity,
+        rate: l.rate,
+        discountPercent: l.discountPercent,
+        taxId: l.taxId,
+        amount: l.amount,
+      })),
+    );
+
+    await tx
+      .update(estimates)
+      .set({ status: "accepted", updatedAt: new Date() })
+      .where(eq(estimates.id, estimateId));
+    return invoice.id;
+  });
+
+  await logActivity({
+    action: `converted estimate ${estimate.number} to invoice`,
+    entityType: "invoice",
+    entityId: invId,
+  });
+
+  revalidatePath("/office/sales/estimates");
+  redirect("/office/sales/invoices");
 }

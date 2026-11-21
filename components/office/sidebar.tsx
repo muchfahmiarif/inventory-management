@@ -171,6 +171,8 @@ const Sidebar = () => {
     { name: "Customers", href: "/office/sales/customers", new: "/office/sales/customers/new" },
     { name: "Estimates", href: "/office/sales/estimates", new: "/office/sales/estimates/new" },
     { name: "Sales Orders", href: "/office/sales/sales-orders", new: "/office/sales/sales-orders/new" },
+    { name: "Packages", href: "/office/sales/packages" },
+    { name: "Shipments", href: "/office/sales/shipments" },
     { name: "Invoices", href: "/office/sales/invoices", new: "/office/sales/invoices/new" },
     { name: "Deliver Challans", href: "/office/sales/deliver-challans", new: "/office/sales/deliver-challans/new" },
     { name: "Customer Payments", href: "/office/sales/customer-payments" },

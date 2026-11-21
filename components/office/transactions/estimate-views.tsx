@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 import {
+  createInvoiceFromEstimate,
+  createSalesOrderFromEstimate,
   deleteEstimate,
   deleteEstimates,
   setEstimateStatus,
@@ -33,6 +35,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -226,6 +230,14 @@ function EstimateDetail({ data }: { data: EstimateDetailData }) {
       onPrimaryAction={() => router.push(`/office/sales/estimates/${data.id}/edit`)}
       actionsMenu={
         <>
+          <DropdownMenuItem onClick={() => createSalesOrderFromEstimate(data.id)}>
+            Create Sales Order
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => createInvoiceFromEstimate(data.id)}>
+            Create Invoice
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel>Mark as</DropdownMenuLabel>
           {ESTIMATE_STATUSES.filter((s) => s !== data.status).map((s) => (
             <DropdownMenuItem key={s} onClick={() => setEstimateStatus(data.id, s)}>
               Mark as <span className="capitalize">{s}</span>

@@ -6,7 +6,15 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { db } from "@/db";
-import { customerPayments, invoiceLines, invoices, items, taxes } from "@/db/schema";
+import {
+  customerPayments,
+  invoiceLines,
+  invoices,
+  items,
+  salesOrderLines,
+  salesOrders,
+  taxes,
+} from "@/db/schema";
 import { logActivity } from "@/lib/activity";
 import { nextNumber } from "@/lib/numbering";
 import {
@@ -229,4 +237,68 @@ export async function deleteInvoice(id: string) {
   });
   revalidatePath(PATH);
   redirect(PATH);
+}
+
+// Convert a sales order into an invoice (copies header + lines, marks SO invoiced)
+export async function createInvoiceFromSalesOrder(salesOrderId: string) {
+  const [so] = await db
+    .select()
+    .from(salesOrders)
+    .where(eq(salesOrders.id, salesOrderId));
+  if (!so) throw new Error("Sales order not found");
+
+  const soLines = await db
+    .select()
+    .from(salesOrderLines)
+    .where(eq(salesOrderLines.salesOrderId, salesOrderId));
+
+  const id = await db.transaction(async (tx) => {
+    const number = await nextNumber(tx, "invoices");
+    const [invoice] = await tx
+      .insert(invoices)
+      .values({
+        number,
+        date: new Date().toISOString().slice(0, 10),
+        contactId: so.contactId,
+        salesOrderId: so.id,
+        reference: so.number,
+        notes: so.notes,
+        terms: so.terms,
+        status: "draft",
+        subtotal: so.subtotal,
+        discountTotal: so.discountTotal,
+        taxTotal: so.taxTotal,
+        total: so.total,
+      })
+      .returning();
+
+    await tx.insert(invoiceLines).values(
+      soLines.map((l) => ({
+        invoiceId: invoice.id,
+        itemId: l.itemId,
+        name: l.name,
+        description: l.description,
+        quantity: l.quantity,
+        rate: l.rate,
+        discountPercent: l.discountPercent,
+        taxId: l.taxId,
+        amount: l.amount,
+      })),
+    );
+
+    await tx
+      .update(salesOrders)
+      .set({ status: "invoiced", updatedAt: new Date() })
+      .where(eq(salesOrders.id, so.id));
+    return invoice.id;
+  });
+
+  await logActivity({
+    action: `converted sales order ${so.number} to invoice`,
+    entityType: "invoice",
+    entityId: id,
+  });
+
+  revalidatePath(PATH);
+  redirect(`${PATH}/${id}`);
 }

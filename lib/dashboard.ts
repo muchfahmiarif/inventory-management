@@ -1,13 +1,13 @@
-import { and, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { salesOrders, stockMovements } from "@/db/schema";
+import { packages, salesOrders, shipments, stockMovements } from "@/db/schema";
 
 // Dashboard "Sales Activity" + "Inventory Summary", fed by real records.
-// Mapping for the modules built so far:
-// - To be packed   = confirmed sales orders
-// - To be shipped  = packed sales orders
-// - To be delivered = shipped sales orders
+// Mapping with the full SO→Package→Shipment chain:
+// - To be packed    = confirmed sales orders (not yet packed)
+// - To be shipped   = draft packages (packed, waiting for shipment)
+// - To be delivered = shipped shipments (in transit, not delivered)
 // - To be invoiced  = confirmed/packed/shipped orders not yet invoiced
 export async function getDashboardStats() {
   const countByStatus = await db
@@ -32,10 +32,20 @@ export async function getDashboardStats() {
       ),
     );
 
+  const [toBeShipped] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(packages)
+    .where(eq(packages.status, "draft"));
+
+  const [toBeDelivered] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(shipments)
+    .where(eq(shipments.status, "shipped"));
+
   return {
     toBePacked: byStatus["confirmed"] ?? 0,
-    toBeShipped: byStatus["packed"] ?? 0,
-    toBeDelivered: byStatus["shipped"] ?? 0,
+    toBeShipped: toBeShipped?.count ?? 0,
+    toBeDelivered: toBeDelivered?.count ?? 0,
     toBeInvoiced: toBeInvoiced?.count ?? 0,
     quantityInHand: stock?.inHand ?? 0,
     // Purchase orders module (Phase 4) will feed this

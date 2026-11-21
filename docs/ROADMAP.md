@@ -132,13 +132,13 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
 - [x] **Verified E2E in browser**: form create → ITEM-00001 auto-number →
       opening-stock ledger row (+15, balance 15) → redirect to detail → row on
       list page with red low-stock highlighting.
-- [ ] **Item Groups**: list (name, # items, description) + New form (name, variant
+- [x] **Item Groups**: list (name, # items, description) + New form (name, variant
       attributes, description) + detail.
-- [ ] **Composite Items**: list + form (component item picker + qty per component,
+- [x] **Composite Items**: list + form (component item picker + qty per component,
       computed cost) + detail.
-- [ ] **Price Lists**: list + form (currency, markup/markdown, per-item rows) +
+- [x] **Price Lists**: list + form (currency, markup/markdown, per-item rows) +
       detail.
-- [ ] Sidebar Inventory section fully live; option-card CTA buttons link to the
+- [x] Sidebar Inventory section fully live; option-card CTA buttons link to the
       four modules.
 
 ## Phase 2 — Stock operations ✅ (2026-11-20)
@@ -153,7 +153,7 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
       reverses shipped stock.
 - [x] Verified E2E: adjustment +5 → stock 20; transfer 3 units between
       warehouses, per-warehouse ledger totals exact.
-- [ ] **Stock Counts**: list; New (warehouse, items with system vs counted qty);
+- [x] **Stock Counts**: list; New (warehouse, items with system vs counted qty);
       on complete generates adjustment.
 
 ## Phase 3 — Sales (in progress — core done 2026-11-20)
@@ -177,19 +177,24 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
       stock-in movements; delete reverses received stock.
 - [x] **Customer Payments** standalone list (PM-#### records from invoice
       payments).
-- [ ] Packages, Shipments, Sales Returns stock movements done; Packages +
-      Shipments modules themselves pending (SO→Package→Shipment chain).
+- [x] **Packages** (PKG-####): created from a confirmed SO (packed qty ≤ ordered,
+      warehouse select); statuses Draft→Shipped→Delivered.
+- [x] **Shipments** (SHP-####): created from a package w/ carrier + tracking;
+      creation writes **stock-out movements** from the package warehouse; Mark
+      Delivered → package + SO fulfilled; delete reverses stock. Verified E2E:
+      SO→Package→Shipment→Delivered chain, per-warehouse ledger exact.
 - [x] **Vendors** (Phase 4 opener): full module reusing contacts views at
       `/office/purchases/vendors`.
-- [ ] Customer Payments standalone list.
-- [ ] Convert actions (Estimate→SO→Invoice) — statuses exist, convert buttons pending.
+- [x] Customer Payments standalone list.
+- [x] Convert actions: Estimate → Sales Order / Invoice buttons (copies lines +
+      totals, marks estimate accepted); SO → Invoice button (marks SO invoiced).
 - [x] Dashboard "Sales Activity" + "Inventory Summary" count real records
       (lib/dashboard.ts: SO statuses + stock ledger sum).
-- [ ] Verify: payment flips invoice to Paid (code path done, UI dialog test pending).
+- [x] Verified: payment flips invoice to Paid via UI dialog (INV-00001 → Paid).
 
 ## Phase 4 — Purchases
 
-- [ ] **Vendors** (mirror customers).
+- [x] **Vendors** (mirror customers).
 - [ ] **Expenses**: list + form (category, vendor, amount, billable).
 - [ ] **Purchase Orders**: list + form (vendor, lines); Receive Items → stock in;
       status flow.

@@ -44,7 +44,13 @@ const PageFormShell = ({
             <Button variant="outline" onClick={() => router.back()}>
               Cancel
             </Button>
-            <Button type="submit" form={formId}>
+            <Button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById(formId);
+                if (el instanceof HTMLFormElement) el.requestSubmit();
+              }}
+            >
               Save
             </Button>
           </div>

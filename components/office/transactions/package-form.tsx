@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { formatQty } from "@/lib/format";
-import { packageFormSchema } from "@/lib/schemas/packages";
+import { packageFormSchema, type PackageFormInput } from "@/lib/schemas/packages";
 
 const FORM_ID = "package-form";
 
@@ -83,6 +83,10 @@ const PackageForm = ({
   return (
     <PageFormShell title={`New Package — ${soNumber}`} formId={FORM_ID}>
       <Form {...form}>
+        {/* TEMP DEBUG */}
+        <pre data-testid="debug-errors" className="text-xs text-red-500">
+          {JSON.stringify(form.formState.errors, null, 2)}
+        </pre>
         <form
           id={FORM_ID}
           onSubmit={form.handleSubmit(onSubmit)}

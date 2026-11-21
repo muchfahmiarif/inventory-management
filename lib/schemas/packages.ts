@@ -7,7 +7,8 @@ const optionalNumber = z.preprocess(
 
 export const packageFormSchema = z.object({
   date: z.string().min(1, "Date is required"),
-  salesOrderId: z.string().min(1, "Select a sales order"),
+  // salesOrderId comes from the ?soId= route param, added to the payload in
+  // the form's onSubmit — not a rendered field, so no schema entry here
   warehouseId: z.string().min(1, "Select a warehouse"),
   notes: z.string().optional(),
   lines: z

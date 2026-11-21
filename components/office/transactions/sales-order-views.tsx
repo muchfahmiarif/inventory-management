@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 
 import { deleteSalesOrder, deleteSalesOrders, setSalesOrderStatus } from "@/actions/sales-orders";
+import { createInvoiceFromSalesOrder } from "@/actions/invoices";
 import DetailPageShell from "@/components/shared/detail-page";
 import DataTable, {
   DataTableFeatures,
@@ -178,6 +179,7 @@ export interface SalesOrderDetailData {
 
 function SalesOrderDetail({ data }: { data: SalesOrderDetailData }) {
   const router = useRouter();
+  const canPack = ["confirmed", "packed"].includes(data.status);
 
   return (
     <DetailPageShell
@@ -189,6 +191,18 @@ function SalesOrderDetail({ data }: { data: SalesOrderDetailData }) {
       onPrimaryAction={() => router.push(`/office/sales/sales-orders/${data.id}/edit`)}
       actionsMenu={
         <>
+          {canPack && (
+            <>
+              <DropdownMenuItem
+                onClick={() => router.push(`/office/sales/packages/new?soId=${data.id}`)}
+              >
+                Create Package
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => createInvoiceFromSalesOrder(data.id)}>
+                Create Invoice
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuLabel>Mark as</DropdownMenuLabel>
           {SO_STATUSES.filter((s) => s !== data.status).map((s) => (
             <DropdownMenuItem key={s} onClick={() => setSalesOrderStatus(data.id, s)}>
