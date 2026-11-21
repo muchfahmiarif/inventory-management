@@ -11,14 +11,14 @@ const DashboardPage = async () => {
   const stats = await getDashboardStats();
 
   return (
-    <div className="flex h-[200rem] flex-col items-center bg-primary-foreground">
+    <div className="flex h-[200rem] flex-col items-center bg-primary-foreground dark:bg-background">
       {/* TODO: CREATE FUNCTION DISABLE BANNER IF PAYMENT METHOD ALREADY SET */}
       {/* <BannerDashboard /> */}
       {/* Part 1 */}
       <div className="mx-4 flex w-full max-w-screen-lg flex-row justify-between gap-x-4">
         {/* Sales Activity */}
         <div className="mt-10 flex flex-col rounded-xl border">
-          <div className="bg-zinc-100 p-2">
+          <div className="bg-zinc-100 p-2 dark:bg-muted">
             <h2 className="text-lg">Sales Activity</h2>
           </div>
           <div className="m-4 flex flex-row items-center justify-center">
@@ -93,7 +93,7 @@ const DashboardPage = async () => {
         </div>
         {/* Inventory Summary */}
         <div className="mt-10 flex flex-col rounded-xl border">
-          <div className="bg-zinc-100 p-2">
+          <div className="bg-zinc-100 p-2 dark:bg-muted">
             <h2 className="text-lg">Inventory Summary</h2>
           </div>
           <div className="mx-4 flex flex-col">

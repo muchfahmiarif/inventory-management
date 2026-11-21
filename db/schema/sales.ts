@@ -145,6 +145,8 @@ export const salesOrderLines = pgTable("sales_order_lines", {
 export const packages = pgTable("packages", {
   ...headerFields("packages_number"),
   salesOrderId: uuid("sales_order_id").references(() => salesOrders.id),
+  // Warehouse the packed goods ship from; stock-out happens on shipment
+  warehouseId: uuid("warehouse_id").references(() => warehousesTable.id),
   status: packageStatusEnum("status").notNull().default("draft"),
 });
 

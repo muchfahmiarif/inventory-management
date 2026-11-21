@@ -240,7 +240,7 @@ pages are placeholders: `itemgroups/new`, `adjustments`, `adjustments/new`,
 
 ## Verification (repeat every phase)
 
-1. `npm run db:push` → `npm run dev` → `npm run build` + `npm run lint` green.
+1. `bun run db:push` → `bun run dev` → `bun run build` + `bun run lint` green.
 2. Browser-walk each new route (200s, layout matches Zoho).
 3. Data-flow test per the phase's "Verify" lines.
 4. Tick items here, commit per phase.

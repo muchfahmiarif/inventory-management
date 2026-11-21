@@ -36,7 +36,7 @@ import ThemeToggle from "../ui/theme-toggle";
 
 const HeaderComponents = () => {
   return (
-    <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-slate-100 py-1">
+    <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-slate-100 py-1 dark:bg-card/95 dark:backdrop-blur-sm">
       {/* Left Side */}
       <div className="mx-4 flex gap-x-2">
         <Tooltip>

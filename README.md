@@ -17,8 +17,8 @@ A web application that aims to organize inventory management with reference to Z
 ```bash
 git clone https://github.com/muchfahmiarif/inventory-management.git
 cd inventory-management-system
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 - Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
