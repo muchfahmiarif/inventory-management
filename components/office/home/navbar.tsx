@@ -19,7 +19,7 @@ const NavbarHomePage = () => {
   ];
 
   return (
-    <div className="relative sticky -top-8 flex h-32 flex-col border-b bg-slate-50 dark:bg-card">
+    <div className="sticky -top-8 flex h-32 flex-col border-b bg-slate-50 dark:bg-card">
       {/* Decorative pattern — light mode only */}
       <div
         aria-hidden

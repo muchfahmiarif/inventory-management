@@ -9,6 +9,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -101,7 +102,7 @@ const HeaderComponents = () => {
             <TooltipTrigger asChild>
               <Button
                 variant={"ghost"}
-                size={"icon"}
+                size={"sm"}
                 className="bg-primary/70 hover:bg-primary/90"
               >
                 <Plus size={16} />
@@ -119,8 +120,10 @@ const HeaderComponents = () => {
           <Button variant={"ghost"} size={"icon"}>
             <Bell size={16} />
           </Button>
-          <Button variant={"ghost"} size={"icon"}>
-            <Settings size={16} />
+          <Button variant={"ghost"} size={"icon"} asChild>
+            <Link href="/office/settings" aria-label="Settings">
+              <Settings size={16} />
+            </Link>
           </Button>
         </div>
         <Avatar className="mx-2">
