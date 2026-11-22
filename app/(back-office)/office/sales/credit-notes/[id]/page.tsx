@@ -1,9 +1,35 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { CreditNoteDetail } from "@/components/office/transactions/credit-note-views";
-import { db } from "@/db";
-import { contacts, creditNoteLines, creditNotes } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type DocDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  contactId: string;
+  status: "open" | "closed" | "void";
+  reference: string | null;
+  notes: string | null;
+  terms: string | null;
+  subtotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  total: number;
+  customerName: string;
+  lines: {
+    id: string;
+    itemId: string;
+    itemName: string;
+    description: string | null;
+    quantity: number;
+    rate: number;
+    discountPercent: number;
+    taxId: string;
+    taxName: string | null;
+    amount: number;
+  }[];
+};
 
 export default async function CreditNoteDetailPage({
   params,
@@ -12,47 +38,13 @@ export default async function CreditNoteDetailPage({
 }) {
   const { id } = await params;
 
-  const [note] = await db
-    .select({
-      id: creditNotes.id,
-      number: creditNotes.number,
-      date: creditNotes.date,
-      status: creditNotes.status,
-      reference: creditNotes.reference,
-      notes: creditNotes.notes,
-      total: creditNotes.total,
-      customerName: contacts.displayName,
-    })
-    .from(creditNotes)
-    .leftJoin(contacts, eq(creditNotes.contactId, contacts.id))
-    .where(eq(creditNotes.id, id));
+  let data: DocDetailData;
+  try {
+    data = await api.get<DocDetailData>(`/credit-notes/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!note) notFound();
-
-  const lines = await db
-    .select({
-      id: creditNoteLines.id,
-      itemName: creditNoteLines.name,
-      quantity: creditNoteLines.quantity,
-      rate: creditNoteLines.rate,
-      amount: creditNoteLines.amount,
-    })
-    .from(creditNoteLines)
-    .where(eq(creditNoteLines.creditNoteId, id))
-    .orderBy(asc(creditNoteLines.id));
-
-  return (
-    <CreditNoteDetail
-      data={{
-        ...note,
-        customerName: note.customerName ?? "Unknown",
-        lines: lines.map((l) => ({
-          ...l,
-          quantity: Number(l.quantity),
-          rate: Number(l.rate),
-          amount: Number(l.amount),
-        })),
-      }}
-    />
-  );
+  return <CreditNoteDetail data={data} />;
 }

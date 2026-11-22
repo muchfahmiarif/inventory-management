@@ -4,6 +4,10 @@ import HeaderComponents from "@/components/office/header";
 import Sidebar from "@/components/office/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
+// Pages fetch from the Go backend at request time (with the Clerk session
+// token); prerendering them at build time would run unauthenticated.
+export const dynamic = "force-dynamic";
+
 interface LayoutOfficeProps {
   children: React.ReactNode;
 }

@@ -1,9 +1,7 @@
-import { desc, eq } from "drizzle-orm";
-
-import { db } from "@/db";
-import { contacts, customerPayments, invoices } from "@/db/schema";
-import { formatMoney } from "@/lib/format";
+import { api } from "@/lib/api-client";
+import { formatMoney, formatDate } from "@/lib/format";
 import { Badge } from "@/components/ui/badge";
+import ListToolbar from "@/components/shared/list-toolbar";
 import {
   Table,
   TableBody,
@@ -12,24 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate } from "@/lib/format";
-import ListToolbar from "@/components/shared/list-toolbar";
+
+type PaymentRow = {
+  id: string;
+  number: string;
+  date: string;
+  customerName: string | null;
+  invoiceNumber: string | null;
+  mode: string | null;
+  amount: number;
+};
 
 export default async function CustomerPaymentsPage() {
-  const rows = await db
-    .select({
-      id: customerPayments.id,
-      number: customerPayments.number,
-      date: customerPayments.date,
-      customerName: contacts.displayName,
-      invoiceNumber: invoices.number,
-      mode: customerPayments.mode,
-      amount: customerPayments.amount,
-    })
-    .from(customerPayments)
-    .leftJoin(contacts, eq(customerPayments.contactId, contacts.id))
-    .leftJoin(invoices, eq(customerPayments.invoiceId, invoices.id))
-    .orderBy(desc(customerPayments.date), desc(customerPayments.createdAt));
+  const rows = await api.get<PaymentRow[]>("/invoices/payments");
 
   return (
     <div className="flex flex-col gap-2 px-2 pb-8">

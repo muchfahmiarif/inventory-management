@@ -1,9 +1,37 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { InvoiceDetail } from "@/components/office/transactions/invoice-views";
-import { db } from "@/db";
-import { contacts, invoiceLines, invoices, taxes } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type DocDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  contactId: string;
+  status: "draft" | "sent" | "void" | "partially_paid" | "paid" | "overdue";
+  reference: string | null;
+  notes: string | null;
+  terms: string | null;
+  dueDate: string | null;
+  amountPaid: number;
+  subtotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  total: number;
+  customerName: string;
+  lines: {
+    id: string;
+    itemId: string;
+    itemName: string;
+    description: string | null;
+    quantity: number;
+    rate: number;
+    discountPercent: number;
+    taxId: string;
+    taxName: string | null;
+    amount: number;
+  }[];
+};
 
 export default async function InvoiceDetailPage({
   params,
@@ -12,58 +40,13 @@ export default async function InvoiceDetailPage({
 }) {
   const { id } = await params;
 
-  const [invoice] = await db
-    .select({
-      id: invoices.id,
-      number: invoices.number,
-      date: invoices.date,
-      dueDate: invoices.dueDate,
-      status: invoices.status,
-      reference: invoices.reference,
-      notes: invoices.notes,
-      terms: invoices.terms,
-      subtotal: invoices.subtotal,
-      discountTotal: invoices.discountTotal,
-      taxTotal: invoices.taxTotal,
-      total: invoices.total,
-      amountPaid: invoices.amountPaid,
-      customerName: contacts.displayName,
-    })
-    .from(invoices)
-    .leftJoin(contacts, eq(invoices.contactId, contacts.id))
-    .where(eq(invoices.id, id));
+  let data: DocDetailData;
+  try {
+    data = await api.get<DocDetailData>(`/invoices/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!invoice) notFound();
-
-  const lines = await db
-    .select({
-      id: invoiceLines.id,
-      itemName: invoiceLines.name,
-      description: invoiceLines.description,
-      quantity: invoiceLines.quantity,
-      rate: invoiceLines.rate,
-      discountPercent: invoiceLines.discountPercent,
-      taxName: taxes.name,
-      amount: invoiceLines.amount,
-    })
-    .from(invoiceLines)
-    .leftJoin(taxes, eq(invoiceLines.taxId, taxes.id))
-    .where(eq(invoiceLines.invoiceId, id))
-    .orderBy(asc(invoiceLines.id));
-
-  return (
-    <InvoiceDetail
-      data={{
-        ...invoice,
-        customerName: invoice.customerName ?? "Unknown",
-        lines: lines.map((l) => ({
-          ...l,
-          quantity: Number(l.quantity),
-          rate: Number(l.rate),
-          discountPercent: Number(l.discountPercent),
-          amount: Number(l.amount),
-        })),
-      }}
-    />
-  );
+  return <InvoiceDetail data={data} />;
 }

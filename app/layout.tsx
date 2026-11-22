@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
+import { ClerkProviderGate } from "@/providers/clerk-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 
 // Zoho uses Roboto across its products
@@ -23,10 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${roboto.variable} font-sans`}>
-        <ThemeProvider attribute="class">
-          {children}
-          <Toaster position="bottom-right" richColors />
-        </ThemeProvider>
+        <ClerkProviderGate>
+          <ThemeProvider attribute="class">
+            {children}
+            <Toaster position="bottom-right" richColors />
+          </ThemeProvider>
+        </ClerkProviderGate>
       </body>
     </html>
   );

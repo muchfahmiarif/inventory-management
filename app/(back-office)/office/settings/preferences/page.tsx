@@ -1,9 +1,10 @@
 import { PreferencesClient } from "@/components/office/settings/preferences-client";
-import { db } from "@/db";
-import { orgFlags } from "@/db/schema";
+import { api } from "@/lib/api-client";
+
+type FlagRow = { key: string; value: boolean };
 
 export default async function PreferencesSettingsPage() {
-  const rows = await db.select().from(orgFlags);
+  const flags = await api.get<FlagRow[]>("/settings/flags");
 
-  return <PreferencesClient flags={rows.map((r) => ({ key: r.key, value: r.value }))} />;
+  return <PreferencesClient flags={flags} />;
 }

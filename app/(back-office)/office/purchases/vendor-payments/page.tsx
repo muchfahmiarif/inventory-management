@@ -1,7 +1,6 @@
-import { desc, eq } from "drizzle-orm";
-
-import { db } from "@/db";
-import { bills, contacts, vendorPayments } from "@/db/schema";
+import { api } from "@/lib/api-client";
+import { formatMoney, formatDate } from "@/lib/format";
+import { Badge } from "@/components/ui/badge";
 import ListToolbar from "@/components/shared/list-toolbar";
 import {
   Table,
@@ -11,24 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, formatMoney } from "@/lib/format";
-import { Badge } from "@/components/ui/badge";
+
+type VendorPaymentRow = {
+  id: string;
+  number: string;
+  date: string;
+  vendorName: string | null;
+  billNumber: string | null;
+  mode: string | null;
+  amount: number;
+};
 
 export default async function VendorPaymentsPage() {
-  const rows = await db
-    .select({
-      id: vendorPayments.id,
-      number: vendorPayments.number,
-      date: vendorPayments.date,
-      vendorName: contacts.displayName,
-      billNumber: bills.number,
-      mode: vendorPayments.mode,
-      amount: vendorPayments.amount,
-    })
-    .from(vendorPayments)
-    .leftJoin(contacts, eq(vendorPayments.contactId, contacts.id))
-    .leftJoin(bills, eq(vendorPayments.billId, bills.id))
-    .orderBy(desc(vendorPayments.date), desc(vendorPayments.createdAt));
+  const rows = await api.get<VendorPaymentRow[]>("/bills/payments");
 
   return (
     <div className="flex flex-col gap-2 px-2 pb-8">
@@ -66,7 +60,7 @@ export default async function VendorPaymentsPage() {
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                  No vendor payments yet — record them from a bill
+                  No payments recorded yet — record them from a bill
                 </TableCell>
               </TableRow>
             )}

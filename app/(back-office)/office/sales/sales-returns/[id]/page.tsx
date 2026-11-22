@@ -1,9 +1,20 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { SalesReturnDetail } from "@/components/office/transactions/sales-return-views";
-import { db } from "@/db";
-import { contacts, items, salesReturnLines, salesReturns, warehouses } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type SalesReturnDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  status: "draft" | "received" | "cancelled";
+  reference: string | null;
+  notes: string | null;
+  total: number;
+  customerName: string;
+  warehouseName: string | null;
+  lines: { id: string; itemName: string; quantity: number; rate: number; amount: number }[];
+};
 
 export default async function SalesReturnDetailPage({
   params,
@@ -12,51 +23,13 @@ export default async function SalesReturnDetailPage({
 }) {
   const { id } = await params;
 
-  const [ret] = await db
-    .select({
-      id: salesReturns.id,
-      number: salesReturns.number,
-      date: salesReturns.date,
-      status: salesReturns.status,
-      reference: salesReturns.reference,
-      notes: salesReturns.notes,
-      total: salesReturns.total,
-      customerName: contacts.displayName,
-      warehouseName: warehouses.name,
-    })
-    .from(salesReturns)
-    .leftJoin(contacts, eq(salesReturns.contactId, contacts.id))
-    .leftJoin(warehouses, eq(salesReturns.warehouseId, warehouses.id))
-    .where(eq(salesReturns.id, id));
+  let data: SalesReturnDetailData;
+  try {
+    data = await api.get<SalesReturnDetailData>(`/sales-returns/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!ret) notFound();
-
-  const lines = await db
-    .select({
-      id: salesReturnLines.id,
-      itemName: items.name,
-      quantity: salesReturnLines.quantity,
-      rate: salesReturnLines.rate,
-      amount: salesReturnLines.amount,
-    })
-    .from(salesReturnLines)
-    .innerJoin(items, eq(salesReturnLines.itemId, items.id))
-    .where(eq(salesReturnLines.salesReturnId, id))
-    .orderBy(asc(salesReturnLines.id));
-
-  return (
-    <SalesReturnDetail
-      data={{
-        ...ret,
-        customerName: ret.customerName ?? "Unknown",
-        lines: lines.map((l) => ({
-          id: l.id,
-          itemName: l.itemName,
-          quantity: Number(l.quantity),
-          rate: Number(l.rate),
-          amount: Number(l.amount),
-        })),
-      }}
-    />
-  );
+  return <SalesReturnDetail data={data} />;
 }

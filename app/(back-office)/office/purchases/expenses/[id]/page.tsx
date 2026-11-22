@@ -1,9 +1,21 @@
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { ExpenseDetail } from "@/components/office/transactions/expense-views";
-import { db } from "@/db";
-import { contacts, expenseCategories, expenses } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type ExpenseDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  description: string;
+  status: string;
+  vendorName: string | null;
+  categoryName: string | null;
+  amount: number;
+  notes: string | null;
+  vendorId: string | null;
+  categoryId: string | null;
+};
 
 export default async function ExpenseDetailPage({
   params,
@@ -12,24 +24,13 @@ export default async function ExpenseDetailPage({
 }) {
   const { id } = await params;
 
-  const [expense] = await db
-    .select({
-      id: expenses.id,
-      number: expenses.number,
-      date: expenses.date,
-      description: expenses.description,
-      status: expenses.status,
-      vendorName: contacts.displayName,
-      categoryName: expenseCategories.name,
-      amount: expenses.amount,
-      notes: expenses.notes,
-    })
-    .from(expenses)
-    .leftJoin(contacts, eq(expenses.vendorId, contacts.id))
-    .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
-    .where(eq(expenses.id, id));
+  let data: ExpenseDetailData;
+  try {
+    data = await api.get<ExpenseDetailData>(`/expenses/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!expense) notFound();
-
-  return <ExpenseDetail data={expense} />;
+  return <ExpenseDetail data={data} />;
 }

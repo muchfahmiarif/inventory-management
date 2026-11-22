@@ -1,10 +1,35 @@
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
-import ItemForm, { ItemFormValues } from "@/components/office/inventory/items/item-form";
-import { db } from "@/db";
-import { items } from "@/db/schema";
-import { getItemFormOptions } from "@/lib/item-options";
+import ItemForm, { type ItemFormValues } from "@/components/office/inventory/items/item-form";
+import { ApiError, api } from "@/lib/api-client";
+
+type ItemDetailData = {
+  id: string;
+  name: string;
+  sku: string | null;
+  type: "inventory" | "non_inventory" | "service";
+  description: string | null;
+  unitId: string | null;
+  brandId: string | null;
+  categoryId: string | null;
+  groupId: string | null;
+  taxId: string | null;
+  preferredVendorId: string | null;
+  costPrice: number | null;
+  sellingPrice: number | null;
+  wholesalePrice: number | null;
+  reorderLevel: number | null;
+};
+
+type ItemFormOptions = {
+  units: { id: string; name: string }[];
+  brands: { id: string; name: string }[];
+  categories: { id: string; name: string }[];
+  groups: { id: string; name: string }[];
+  taxes: { id: string; name: string }[];
+  warehouses: { id: string; name: string }[];
+  vendors: { id: string; name: string }[];
+};
 
 export default async function EditItemPage({
   params,
@@ -13,10 +38,14 @@ export default async function EditItemPage({
 }) {
   const { id } = await params;
 
-  const [item] = await db.select().from(items).where(eq(items.id, id));
-  if (!item) notFound();
-
-  const options = await getItemFormOptions();
+  let item: ItemDetailData;
+  try {
+    item = await api.get<ItemDetailData>(`/items/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
+  const options = await api.get<ItemFormOptions>("/items/form-options");
 
   const defaultValues: ItemFormValues = {
     name: item.name,

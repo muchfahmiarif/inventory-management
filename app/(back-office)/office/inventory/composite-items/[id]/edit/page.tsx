@@ -1,16 +1,25 @@
-import { asc, eq, ne } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import CompositeItemForm from "@/components/office/inventory/composite-items/composite-item-form";
-import { db } from "@/db";
-import {
-  brands,
-  categories,
-  compositeComponents,
-  compositeItems,
-  items,
-  units,
-} from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type CompositeEditData = {
+  id: string;
+  name: string;
+  sku: string | null;
+  unitId: string | null;
+  brandId: string | null;
+  categoryId: string | null;
+  description: string | null;
+  components: { id: string; itemId: string; itemName: string; quantity: number; costPrice: number | null }[];
+};
+
+type CompositeOptions = {
+  units: { id: string; name: string }[];
+  brands: { id: string; name: string }[];
+  categories: { id: string; name: string }[];
+  items: { id: string; name: string; costPrice: number | null }[];
+};
 
 export default async function EditCompositeItemPage({
   params,
@@ -19,30 +28,14 @@ export default async function EditCompositeItemPage({
 }) {
   const { id } = await params;
 
-  const [composite] = await db
-    .select()
-    .from(compositeItems)
-    .where(eq(compositeItems.id, id));
-  if (!composite) notFound();
-
-  const [unitRows, brandRows, categoryRows, itemRows, componentRows] = await Promise.all([
-    db.select({ id: units.id, name: units.name }).from(units).orderBy(asc(units.name)),
-    db.select({ id: brands.id, name: brands.name }).from(brands).orderBy(asc(brands.name)),
-    db
-      .select({ id: categories.id, name: categories.name })
-      .from(categories)
-      .orderBy(asc(categories.name)),
-    db
-      .select({ id: items.id, name: items.name, costPrice: items.costPrice })
-      .from(items)
-      .where(ne(items.type, "service"))
-      .orderBy(asc(items.name)),
-    db
-      .select({ itemId: compositeComponents.itemId, quantity: compositeComponents.quantity })
-      .from(compositeComponents)
-      .where(eq(compositeComponents.compositeItemId, id))
-      .orderBy(asc(compositeComponents.id)),
-  ]);
+  let composite: CompositeEditData;
+  try {
+    composite = await api.get<CompositeEditData>(`/composite-items/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
+  const options = await api.get<CompositeOptions>("/composite-form-options");
 
   return (
     <CompositeItemForm
@@ -55,17 +48,12 @@ export default async function EditCompositeItemPage({
         brandId: composite.brandId ?? undefined,
         categoryId: composite.categoryId ?? undefined,
         description: composite.description ?? undefined,
-        components: componentRows.map((c) => ({
+        components: composite.components.map((c) => ({
           itemId: c.itemId,
           quantity: String(c.quantity),
         })),
       }}
-      options={{
-        units: unitRows,
-        brands: brandRows,
-        categories: categoryRows,
-        items: itemRows,
-      }}
+      options={options}
     />
   );
 }

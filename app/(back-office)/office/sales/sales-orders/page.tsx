@@ -1,22 +1,17 @@
-import { desc, eq } from "drizzle-orm";
-
 import { SalesOrdersList } from "@/components/office/transactions/sales-order-views";
-import { db } from "@/db";
-import { contacts, salesOrders } from "@/db/schema";
+import { api } from "@/lib/api-client";
+
+type DocRow = {
+  id: string;
+  number: string;
+  date: string;
+  status: "draft" | "confirmed" | "packed" | "shipped" | "invoiced" | "fulfilled" | "cancelled";
+  customerName: string | null;
+  total: number;
+};
 
 export default async function SalesOrdersPage() {
-  const rows = await db
-    .select({
-      id: salesOrders.id,
-      number: salesOrders.number,
-      date: salesOrders.date,
-      status: salesOrders.status,
-      customerName: contacts.displayName,
-      total: salesOrders.total,
-    })
-    .from(salesOrders)
-    .leftJoin(contacts, eq(salesOrders.contactId, contacts.id))
-    .orderBy(desc(salesOrders.date), desc(salesOrders.createdAt));
+  const rows = await api.get<DocRow[]>("/sales-orders");
 
   return <SalesOrdersList data={rows} title="Sales Orders" />;
 }

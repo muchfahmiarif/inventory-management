@@ -1,75 +1,89 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import TransactionForm from "@/components/office/transactions/transaction-form";
 import type { TransactionFormValues } from "@/components/office/transactions/transaction-form";
 import { updateSalesOrder } from "@/actions/sales-orders";
-import { db } from "@/db";
-import { contacts, items, salesOrderLines, salesOrders, taxes } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
 
-export default async function EditSalesOrderPage({
+type DocDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  contactId: string;
+  status: "draft" | "confirmed" | "packed" | "shipped" | "invoiced" | "fulfilled" | "cancelled";
+  reference: string | null;
+  notes: string | null;
+  terms: string | null;
+  expectedShipmentDate: string | null;
+  subtotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  total: number;
+  customerName: string;
+  lines: {
+    id: string;
+    itemId: string;
+    itemName: string;
+    description: string | null;
+    quantity: number;
+    rate: number;
+    discountPercent: number;
+    taxId: string;
+    taxName: string | null;
+    amount: number;
+  }[];
+};
+
+type TxnOptions = {
+  contacts: { id: string; name: string }[];
+  items: { id: string; name: string; sellingPrice: number | null }[];
+  taxes: { id: string; name: string; rate: number }[];
+};
+
+export default async function EditSalesOrdersPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
 
-  const [so] = await db.select().from(salesOrders).where(eq(salesOrders.id, id));
-  if (!so) notFound();
-
-  const [contactRows, itemRows, taxRows, lineRows] = await Promise.all([
-    db
-      .select({ id: contacts.id, name: contacts.displayName })
-      .from(contacts)
-      .where(eq(contacts.type, "customer"))
-      .orderBy(asc(contacts.displayName)),
-    db
-      .select({ id: items.id, name: items.name, sellingPrice: items.sellingPrice })
-      .from(items)
-      .orderBy(asc(items.name)),
-    db.select({ id: taxes.id, name: taxes.name, rate: taxes.rate }).from(taxes).orderBy(asc(taxes.name)),
-    db
-      .select({
-        itemId: salesOrderLines.itemId,
-        description: salesOrderLines.description,
-        quantity: salesOrderLines.quantity,
-        rate: salesOrderLines.rate,
-        discountPercent: salesOrderLines.discountPercent,
-        taxId: salesOrderLines.taxId,
-      })
-      .from(salesOrderLines)
-      .where(eq(salesOrderLines.salesOrderId, id))
-      .orderBy(asc(salesOrderLines.id)),
-  ]);
+  let doc: DocDetailData;
+  try {
+    doc = await api.get<DocDetailData>(`/sales-orders/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
+  const options = await api.get<TxnOptions>("/txn-form-options");
 
   const defaults: TransactionFormValues = {
-    date: so.date,
-    contactId: so.contactId,
-    reference: so.reference ?? undefined,
-    expiryDate: so.expectedShipmentDate ?? undefined,
-    notes: so.notes ?? undefined,
-    terms: so.terms ?? undefined,
-    lines: lineRows.map((l) => ({
+    date: doc.date,
+    contactId: doc.contactId,
+    reference: doc.reference ?? undefined,
+    expiryDate: doc.expectedShipmentDate ?? undefined,
+    notes: doc.notes ?? undefined,
+    terms: doc.terms ?? undefined,
+    lines: doc.lines.map((l) => ({
       itemId: l.itemId,
       description: l.description ?? undefined,
       quantity: String(l.quantity),
       rate: String(l.rate),
       discountPercent: String(l.discountPercent),
-      taxId: l.taxId ?? "none",
+      taxId: l.taxId || "none",
     })),
   };
 
   return (
     <TransactionForm
       mode="edit"
-      transactionId={so.id}
-      title={`Edit ${so.number}`}
+      transactionId={doc.id}
+      title={`Edit ${doc.number}`}
       contactLabel="Customer"
-      submitAction={updateSalesOrder.bind(null, so.id)}
+      submitAction={updateSalesOrder.bind(null, doc.id)}
       defaultValues={defaults}
-      contacts={contactRows}
-      items={itemRows}
-      taxes={taxRows}
+      contacts={options.contacts}
+      items={options.items}
+      taxes={options.taxes}
       extraDateLabel="Expected Shipment Date"
       extraDateKey="expiryDate"
     />

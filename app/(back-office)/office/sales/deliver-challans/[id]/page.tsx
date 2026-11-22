@@ -1,9 +1,35 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { DeliverChallanDetail } from "@/components/office/transactions/deliver-challan-views";
-import { db } from "@/db";
-import { contacts, deliverChallanLines, deliverChallans } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type DocDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  contactId: string;
+  status: "draft" | "sent" | "invoiced" | "cancelled";
+  reference: string | null;
+  notes: string | null;
+  terms: string | null;
+  subtotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  total: number;
+  customerName: string;
+  lines: {
+    id: string;
+    itemId: string;
+    itemName: string;
+    description: string | null;
+    quantity: number;
+    rate: number;
+    discountPercent: number;
+    taxId: string;
+    taxName: string | null;
+    amount: number;
+  }[];
+};
 
 export default async function DeliverChallanDetailPage({
   params,
@@ -12,47 +38,13 @@ export default async function DeliverChallanDetailPage({
 }) {
   const { id } = await params;
 
-  const [challan] = await db
-    .select({
-      id: deliverChallans.id,
-      number: deliverChallans.number,
-      date: deliverChallans.date,
-      status: deliverChallans.status,
-      reference: deliverChallans.reference,
-      notes: deliverChallans.notes,
-      total: deliverChallans.total,
-      customerName: contacts.displayName,
-    })
-    .from(deliverChallans)
-    .leftJoin(contacts, eq(deliverChallans.contactId, contacts.id))
-    .where(eq(deliverChallans.id, id));
+  let data: DocDetailData;
+  try {
+    data = await api.get<DocDetailData>(`/deliver-challans/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!challan) notFound();
-
-  const lines = await db
-    .select({
-      id: deliverChallanLines.id,
-      itemName: deliverChallanLines.name,
-      quantity: deliverChallanLines.quantity,
-      rate: deliverChallanLines.rate,
-      amount: deliverChallanLines.amount,
-    })
-    .from(deliverChallanLines)
-    .where(eq(deliverChallanLines.challanId, id))
-    .orderBy(asc(deliverChallanLines.id));
-
-  return (
-    <DeliverChallanDetail
-      data={{
-        ...challan,
-        customerName: challan.customerName ?? "Unknown",
-        lines: lines.map((l) => ({
-          ...l,
-          quantity: Number(l.quantity),
-          rate: Number(l.rate),
-          amount: Number(l.amount),
-        })),
-      }}
-    />
-  );
+  return <DeliverChallanDetail data={data} />;
 }

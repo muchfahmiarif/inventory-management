@@ -1,9 +1,18 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { PriceListForm } from "@/components/office/inventory/price-lists/price-list-views";
-import { db } from "@/db";
-import { currencies, priceLists } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type PriceListEditData = {
+  id: string;
+  name: string;
+  description: string | null;
+  currencyCode: string;
+  priceType: "markup" | "markdown";
+  percentage: number;
+};
+
+type CurrencyOption = { code: string; name: string; symbol: string };
 
 export default async function EditPriceListPage({
   params,
@@ -12,13 +21,14 @@ export default async function EditPriceListPage({
 }) {
   const { id } = await params;
 
-  const [list] = await db.select().from(priceLists).where(eq(priceLists.id, id));
-  if (!list) notFound();
-
-  const currencyRows = await db
-    .select({ code: currencies.code, name: currencies.name, symbol: currencies.symbol })
-    .from(currencies)
-    .orderBy(asc(currencies.code));
+  let list: PriceListEditData;
+  try {
+    list = await api.get<PriceListEditData>(`/price-lists/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
+  const currencies = await api.get<CurrencyOption[]>("/price-lists/currency-options");
 
   return (
     <PriceListForm
@@ -31,7 +41,7 @@ export default async function EditPriceListPage({
         priceType: list.priceType,
         percentage: String(list.percentage),
       }}
-      currencies={currencyRows}
+      currencies={currencies}
     />
   );
 }

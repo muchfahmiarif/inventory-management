@@ -1,9 +1,36 @@
-import { asc, desc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { EstimateDetail } from "@/components/office/transactions/estimate-views";
-import { db } from "@/db";
-import { contacts, estimateLines, estimates, taxes } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type DocDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  contactId: string;
+  status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired";
+  reference: string | null;
+  notes: string | null;
+  terms: string | null;
+  expiryDate: string | null;
+  subtotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  total: number;
+  customerName: string;
+  lines: {
+    id: string;
+    itemId: string;
+    itemName: string;
+    description: string | null;
+    quantity: number;
+    rate: number;
+    discountPercent: number;
+    taxId: string;
+    taxName: string | null;
+    amount: number;
+  }[];
+};
 
 export default async function EstimateDetailPage({
   params,
@@ -12,57 +39,13 @@ export default async function EstimateDetailPage({
 }) {
   const { id } = await params;
 
-  const [estimate] = await db
-    .select({
-      id: estimates.id,
-      number: estimates.number,
-      date: estimates.date,
-      expiryDate: estimates.expiryDate,
-      status: estimates.status,
-      reference: estimates.reference,
-      notes: estimates.notes,
-      terms: estimates.terms,
-      subtotal: estimates.subtotal,
-      discountTotal: estimates.discountTotal,
-      taxTotal: estimates.taxTotal,
-      total: estimates.total,
-      customerName: contacts.displayName ?? "Unknown",
-    })
-    .from(estimates)
-    .leftJoin(contacts, eq(estimates.contactId, contacts.id))
-    .where(eq(estimates.id, id));
+  let data: DocDetailData;
+  try {
+    data = await api.get<DocDetailData>(`/estimates/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!estimate) notFound();
-
-  const lines = await db
-    .select({
-      id: estimateLines.id,
-      itemName: estimateLines.name,
-      description: estimateLines.description,
-      quantity: estimateLines.quantity,
-      rate: estimateLines.rate,
-      discountPercent: estimateLines.discountPercent,
-      taxName: taxes.name,
-      amount: estimateLines.amount,
-    })
-    .from(estimateLines)
-    .leftJoin(taxes, eq(estimateLines.taxId, taxes.id))
-    .where(eq(estimateLines.estimateId, id))
-    .orderBy(asc(estimateLines.id));
-
-  return (
-    <EstimateDetail
-      data={{
-        ...estimate,
-        customerName: estimate.customerName ?? "Unknown",
-        lines: lines.map((l) => ({
-          ...l,
-          quantity: Number(l.quantity),
-          rate: Number(l.rate),
-          discountPercent: Number(l.discountPercent),
-          amount: Number(l.amount),
-        })),
-      }}
-    />
-  );
+  return <EstimateDetail data={data} />;
 }

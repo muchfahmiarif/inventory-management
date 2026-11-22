@@ -1,22 +1,17 @@
-import { desc, eq } from "drizzle-orm";
-
 import { EstimatesList } from "@/components/office/transactions/estimate-views";
-import { db } from "@/db";
-import { contacts, estimates } from "@/db/schema";
+import { api } from "@/lib/api-client";
+
+type DocRow = {
+  id: string;
+  number: string;
+  date: string;
+  status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired";
+  customerName: string | null;
+  total: number;
+};
 
 export default async function EstimatesPage() {
-  const rows = await db
-    .select({
-      id: estimates.id,
-      number: estimates.number,
-      date: estimates.date,
-      status: estimates.status,
-      customerName: contacts.displayName,
-      total: estimates.total,
-    })
-    .from(estimates)
-    .leftJoin(contacts, eq(estimates.contactId, contacts.id))
-    .orderBy(desc(estimates.date), desc(estimates.createdAt));
+  const rows = await api.get<DocRow[]>("/estimates");
 
   return <EstimatesList data={rows} title="Estimates" />;
 }

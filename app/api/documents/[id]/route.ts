@@ -1,31 +1,28 @@
-import { eq } from "drizzle-orm";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 
-import { db } from "@/db";
-import { documents } from "@/db/schema";
+const BASE_URL = process.env.BACKEND_API_URL ?? "http://localhost:8080/api/v1";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const [doc] = await db.select().from(documents).where(eq(documents.id, id));
-  if (!doc) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const { getToken } = await auth();
+  const token = await getToken();
+
+  const upstream = await fetch(`${BASE_URL}/documents/${id}/download`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!upstream.ok || !upstream.body) {
+    const status = upstream.status === 404 ? 404 : upstream.status === 410 ? 410 : 502;
+    return Response.json({ error: upstream.statusText }, { status });
   }
 
-  const filePath = path.join(process.cwd(), ".data", "uploads", doc.storedName);
-  const file = await readFile(filePath).catch(() => null);
-  if (!file) {
-    return NextResponse.json({ error: "File missing on disk" }, { status: 410 });
-  }
-
-  return new NextResponse(new Uint8Array(file), {
+  return new Response(upstream.body, {
     headers: {
-      "Content-Type": doc.mimeType ?? "application/octet-stream",
-      "Content-Disposition": `attachment; filename="${doc.fileName}"`,
+      "Content-Type": upstream.headers.get("Content-Type") ?? "application/octet-stream",
+      "Content-Disposition":
+        upstream.headers.get("Content-Disposition") ?? `attachment; filename="${id}"`,
     },
   });
 }

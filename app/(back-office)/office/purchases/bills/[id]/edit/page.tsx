@@ -1,11 +1,44 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import TransactionForm from "@/components/office/transactions/transaction-form";
 import type { TransactionFormValues } from "@/components/office/transactions/transaction-form";
 import { updateBill } from "@/actions/bills";
-import { db } from "@/db";
-import { billLines, bills, contacts, items, taxes } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type BillDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  contactId: string;
+  status: string;
+  reference: string | null;
+  notes: string | null;
+  terms: string | null;
+  dueDate: string | null;
+  subtotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  total: number;
+  vendorName: string;
+  lines: {
+    id: string;
+    itemId: string;
+    itemName: string;
+    description: string | null;
+    quantity: number;
+    rate: number;
+    discountPercent: number;
+    taxId: string;
+    taxName: string | null;
+    amount: number;
+  }[];
+};
+
+type TxnOptions = {
+  contacts: { id: string; name: string }[];
+  items: { id: string; name: string; sellingPrice: number | null }[];
+  taxes: { id: string; name: string; rate: number }[];
+};
 
 export default async function EditBillPage({
   params,
@@ -14,62 +47,43 @@ export default async function EditBillPage({
 }) {
   const { id } = await params;
 
-  const [bill] = await db.select().from(bills).where(eq(bills.id, id));
-  if (!bill) notFound();
-
-  const [contactRows, itemRows, taxRows, lineRows] = await Promise.all([
-    db
-      .select({ id: contacts.id, name: contacts.displayName })
-      .from(contacts)
-      .where(eq(contacts.type, "vendor"))
-      .orderBy(asc(contacts.displayName)),
-    db
-      .select({ id: items.id, name: items.name, sellingPrice: items.costPrice })
-      .from(items)
-      .orderBy(asc(items.name)),
-    db.select({ id: taxes.id, name: taxes.name, rate: taxes.rate }).from(taxes).orderBy(asc(taxes.name)),
-    db
-      .select({
-        itemId: billLines.itemId,
-        description: billLines.description,
-        quantity: billLines.quantity,
-        rate: billLines.rate,
-        discountPercent: billLines.discountPercent,
-        taxId: billLines.taxId,
-      })
-      .from(billLines)
-      .where(eq(billLines.billId, id))
-      .orderBy(asc(billLines.id)),
-  ]);
+  let doc: BillDetailData;
+  try {
+    doc = await api.get<BillDetailData>(`/bills/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
+  const options = await api.get<TxnOptions>("/txn-form-options?contactType=vendor");
 
   const defaults: TransactionFormValues = {
-    date: bill.date,
-    contactId: bill.contactId,
-    reference: bill.reference ?? undefined,
-    expiryDate: bill.dueDate ?? undefined,
-    notes: bill.notes ?? undefined,
-    terms: bill.terms ?? undefined,
-    lines: lineRows.map((l) => ({
+    date: doc.date,
+    contactId: doc.contactId,
+    reference: doc.reference ?? undefined,
+    expiryDate: doc.dueDate ?? undefined,
+    notes: doc.notes ?? undefined,
+    terms: doc.terms ?? undefined,
+    lines: doc.lines.map((l) => ({
       itemId: l.itemId,
       description: l.description ?? undefined,
       quantity: String(l.quantity),
       rate: String(l.rate),
       discountPercent: String(l.discountPercent),
-      taxId: l.taxId ?? "none",
+      taxId: l.taxId || "none",
     })),
   };
 
   return (
     <TransactionForm
       mode="edit"
-      transactionId={bill.id}
-      title={`Edit ${bill.number}`}
+      transactionId={doc.id}
+      title={`Edit ${doc.number}`}
       contactLabel="Vendor"
-      submitAction={updateBill.bind(null, bill.id)}
+      submitAction={updateBill.bind(null, doc.id)}
       defaultValues={defaults}
-      contacts={contactRows}
-      items={itemRows}
-      taxes={taxRows}
+      contacts={options.contacts}
+      items={options.items}
+      taxes={options.taxes}
       extraDateLabel="Due Date"
       extraDateKey="expiryDate"
     />

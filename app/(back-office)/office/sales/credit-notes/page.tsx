@@ -1,22 +1,17 @@
-import { desc, eq } from "drizzle-orm";
-
 import { CreditNotesList } from "@/components/office/transactions/credit-note-views";
-import { db } from "@/db";
-import { contacts, creditNotes } from "@/db/schema";
+import { api } from "@/lib/api-client";
+
+type DocRow = {
+  id: string;
+  number: string;
+  date: string;
+  status: "open" | "closed" | "void";
+  customerName: string | null;
+  total: number;
+};
 
 export default async function CreditNotesPage() {
-  const rows = await db
-    .select({
-      id: creditNotes.id,
-      number: creditNotes.number,
-      date: creditNotes.date,
-      status: creditNotes.status,
-      customerName: contacts.displayName,
-      total: creditNotes.total,
-    })
-    .from(creditNotes)
-    .leftJoin(contacts, eq(creditNotes.contactId, contacts.id))
-    .orderBy(desc(creditNotes.date), desc(creditNotes.createdAt));
+  const rows = await api.get<DocRow[]>("/credit-notes");
 
   return <CreditNotesList data={rows} title="Credit Notes" />;
 }

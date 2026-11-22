@@ -1,9 +1,22 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { StockCountDetail } from "@/components/office/stock-counts/stock-count-views";
-import { db } from "@/db";
-import { items, stockCountLines, stockCounts, warehouses } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type StockCountDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  status: "draft" | "completed";
+  notes: string | null;
+  warehouseName: string | null;
+  lines: {
+    id: string;
+    itemName: string;
+    systemQuantity: number;
+    countedQuantity: number | null;
+  }[];
+};
 
 export default async function StockCountDetailPage({
   params,
@@ -12,44 +25,13 @@ export default async function StockCountDetailPage({
 }) {
   const { id } = await params;
 
-  const [count] = await db
-    .select({
-      id: stockCounts.id,
-      number: stockCounts.number,
-      date: stockCounts.date,
-      status: stockCounts.status,
-      notes: stockCounts.notes,
-      warehouseName: warehouses.name,
-    })
-    .from(stockCounts)
-    .leftJoin(warehouses, eq(stockCounts.warehouseId, warehouses.id))
-    .where(eq(stockCounts.id, id));
+  let data: StockCountDetailData;
+  try {
+    data = await api.get<StockCountDetailData>(`/stock-counts/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!count) notFound();
-
-  const lines = await db
-    .select({
-      id: stockCountLines.id,
-      itemName: items.name,
-      systemQuantity: stockCountLines.systemQuantity,
-      countedQuantity: stockCountLines.countedQuantity,
-    })
-    .from(stockCountLines)
-    .innerJoin(items, eq(stockCountLines.itemId, items.id))
-    .where(eq(stockCountLines.stockCountId, id))
-    .orderBy(asc(items.name));
-
-  return (
-    <StockCountDetail
-      data={{
-        ...count,
-        lines: lines.map((l) => ({
-          id: l.id,
-          itemName: l.itemName,
-          systemQuantity: Number(l.systemQuantity),
-          countedQuantity: l.countedQuantity === null ? null : Number(l.countedQuantity),
-        })),
-      }}
-    />
-  );
+  return <StockCountDetail data={data} />;
 }

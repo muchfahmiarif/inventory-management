@@ -1,10 +1,33 @@
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
-import { ContactForm } from "@/components/office/contacts/contact-views";
-import type { ContactFormValues } from "@/components/office/contacts/contact-views";
-import { db } from "@/db";
-import { contacts } from "@/db/schema";
+import { ContactForm, type ContactFormValues } from "@/components/office/contacts/contact-views";
+import { ApiError, api } from "@/lib/api-client";
+
+type ContactData = {
+  id: string;
+  type: "customer" | "vendor";
+  displayName: string;
+  firstName: string | null;
+  lastName: string | null;
+  companyName: string | null;
+  email: string | null;
+  phone: string | null;
+  mobile: string | null;
+  website: string | null;
+  billingAddressLine1: string | null;
+  billingCity: string | null;
+  billingState: string | null;
+  billingZip: string | null;
+  billingCountry: string | null;
+  shippingAddressLine1: string | null;
+  shippingCity: string | null;
+  shippingState: string | null;
+  shippingZip: string | null;
+  shippingCountry: string | null;
+  taxNumber: string | null;
+  currencyCode: string | null;
+  notes: string | null;
+};
 
 export default async function EditVendorPage({
   params,
@@ -12,11 +35,20 @@ export default async function EditVendorPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [c] = await db.select().from(contacts).where(eq(contacts.id, id));
-  if (!c || c.type !== "vendor") notFound();
+
+  let c: ContactData;
+  try {
+    c = await api.get<ContactData>(`/contacts/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
+  if (c.type !== "vendor") notFound();
 
   const defaults: ContactFormValues = {
     displayName: c.displayName,
+    firstName: c.firstName ?? undefined,
+    lastName: c.lastName ?? undefined,
     companyName: c.companyName ?? undefined,
     email: c.email ?? undefined,
     phone: c.phone ?? undefined,

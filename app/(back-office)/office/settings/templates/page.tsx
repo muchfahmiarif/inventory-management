@@ -1,21 +1,10 @@
-import { asc } from "drizzle-orm";
-
 import { TemplatesClient } from "@/components/office/settings/templates-client";
-import { db } from "@/db";
-import { templates } from "@/db/schema";
+import { api } from "@/lib/api-client";
+
+type TemplateRow = { id: string; name: string; type: string; subject: string; body: string };
 
 export default async function TemplatesSettingsPage() {
-  const rows = await db.select().from(templates).orderBy(asc(templates.name));
+  const rows = await api.get<TemplateRow[]>("/settings/templates");
 
-  return (
-    <TemplatesClient
-      rows={rows.map((r) => ({
-        id: r.id,
-        name: r.name,
-        type: r.type,
-        subject: r.subject ?? "",
-        body: r.body ?? "",
-      }))}
-    />
-  );
+  return <TemplatesClient rows={rows} />;
 }

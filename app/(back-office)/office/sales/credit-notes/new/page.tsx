@@ -1,23 +1,15 @@
-import { asc, eq } from "drizzle-orm";
-
 import TransactionForm from "@/components/office/transactions/transaction-form";
 import { createCreditNote } from "@/actions/credit-notes";
-import { db } from "@/db";
-import { contacts, items, taxes } from "@/db/schema";
+import { api } from "@/lib/api-client";
 
-export default async function NewCreditNotePage() {
-  const [contactRows, itemRows, taxRows] = await Promise.all([
-    db
-      .select({ id: contacts.id, name: contacts.displayName })
-      .from(contacts)
-      .where(eq(contacts.type, "customer"))
-      .orderBy(asc(contacts.displayName)),
-    db
-      .select({ id: items.id, name: items.name, sellingPrice: items.sellingPrice })
-      .from(items)
-      .orderBy(asc(items.name)),
-    db.select({ id: taxes.id, name: taxes.name, rate: taxes.rate }).from(taxes).orderBy(asc(taxes.name)),
-  ]);
+type TxnOptions = {
+  contacts: { id: string; name: string }[];
+  items: { id: string; name: string; sellingPrice: number | null }[];
+  taxes: { id: string; name: string; rate: number }[];
+};
+
+export default async function NewCreditNotesPage() {
+  const options = await api.get<TxnOptions>("/txn-form-options");
 
   return (
     <TransactionForm
@@ -30,9 +22,9 @@ export default async function NewCreditNotePage() {
         contactId: "",
         lines: [{ itemId: "", quantity: "1", rate: "0", discountPercent: "0", taxId: "none" }],
       }}
-      contacts={contactRows}
-      items={itemRows}
-      taxes={taxRows}
+      contacts={options.contacts}
+      items={options.items}
+      taxes={options.taxes}
     />
   );
 }

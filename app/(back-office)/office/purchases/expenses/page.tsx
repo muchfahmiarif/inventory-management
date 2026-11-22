@@ -1,24 +1,19 @@
-import { desc, eq } from "drizzle-orm";
-
 import { ExpensesList } from "@/components/office/transactions/expense-views";
-import { db } from "@/db";
-import { contacts, expenseCategories, expenses } from "@/db/schema";
+import { api } from "@/lib/api-client";
+
+type ExpenseRow = {
+  id: string;
+  number: string;
+  date: string;
+  description: string;
+  status: string;
+  vendorName: string | null;
+  categoryName: string | null;
+  amount: number;
+};
 
 export default async function ExpensesPage() {
-  const rows = await db
-    .select({
-      id: expenses.id,
-      number: expenses.number,
-      date: expenses.date,
-      description: expenses.description,
-      vendorName: contacts.displayName,
-      categoryName: expenseCategories.name,
-      amount: expenses.amount,
-    })
-    .from(expenses)
-    .leftJoin(contacts, eq(expenses.vendorId, contacts.id))
-    .leftJoin(expenseCategories, eq(expenses.categoryId, expenseCategories.id))
-    .orderBy(desc(expenses.date), desc(expenses.createdAt));
+  const rows = await api.get<ExpenseRow[]>("/expenses");
 
   return <ExpensesList data={rows} title="Expenses" />;
 }

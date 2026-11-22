@@ -1,38 +1,15 @@
 "use server";
 
-import { eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { db } from "@/db";
-import {
-  brands,
-  categories,
-  currencies,
-  taxes,
-  organization,
-  roles,
-  templates,
-  units,
-  users,
-  orgFlags,
-  numberingSeries,
-} from "@/db/schema";
-import { logActivity } from "@/lib/activity";
+import { ApiError, api } from "@/lib/api-client";
 
-type DbTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+// Thin proxies to the Go backend; signatures match the original actions.
+// Result shapes ({ok:false, errors} / {ok:false, error}) are preserved because
+// the settings clients read them as return values, not thrown exceptions.
 
-// ---------- generic entity CRUD (units, brands, categories, taxes, currencies)
-
-const ENTITY_TABLES = {
-  units,
-  brands,
-  categories,
-  taxes,
-  currencies,
-} as const;
-
-type EntitySlug = keyof typeof ENTITY_TABLES;
+type EntitySlug = "units" | "brands" | "categories" | "taxes" | "currencies";
 
 const ENTITY_PATHS: Record<EntitySlug, string> = {
   units: "/office/settings/units",
@@ -43,18 +20,9 @@ const ENTITY_PATHS: Record<EntitySlug, string> = {
 };
 
 const ENTITY_SCHEMAS: Record<EntitySlug, z.ZodTypeAny> = {
-  units: z.object({
-    name: z.string().min(1, "Name is required"),
-    description: z.string().optional(),
-  }),
-  brands: z.object({
-    name: z.string().min(1, "Name is required"),
-    description: z.string().optional(),
-  }),
-  categories: z.object({
-    name: z.string().min(1, "Name is required"),
-    description: z.string().optional(),
-  }),
+  units: z.object({ name: z.string().min(1, "Name is required"), description: z.string().optional() }),
+  brands: z.object({ name: z.string().min(1, "Name is required"), description: z.string().optional() }),
+  categories: z.object({ name: z.string().min(1, "Name is required"), description: z.string().optional() }),
   taxes: z.object({
     name: z.string().min(1, "Name is required"),
     rate: z.coerce.number().min(0, "Rate must be ≥ 0"),
@@ -68,102 +36,67 @@ const ENTITY_SCHEMAS: Record<EntitySlug, z.ZodTypeAny> = {
   }),
 };
 
-function revalidateEntity(slug: EntitySlug) {
-  revalidatePath(ENTITY_PATHS[slug]);
+type ActionResult = { ok: true } | { ok: false; errors?: Record<string, string[]>; error?: string };
+
+function fieldErrorsFrom(err: unknown): Record<string, string[]> | undefined {
+  if (err instanceof ApiError && err.fieldErrors) {
+    const out: Record<string, string[]> = {};
+    for (const [k, v] of Object.entries(err.fieldErrors)) out[k] = [v];
+    return out;
+  }
+  return undefined;
 }
 
 export async function createSettingEntity(
   slug: EntitySlug,
   values: Record<string, unknown>,
-) {
+): Promise<ActionResult> {
   const schema = ENTITY_SCHEMAS[slug];
   if (!schema) throw new Error(`Unknown settings entity: ${slug}`);
   const parsed = schema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false as const, errors: z.flattenError(parsed.error) };
+    return { ok: false, errors: z.flattenError(parsed.error) as unknown as Record<string, string[]> };
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const table = ENTITY_TABLES[slug] as any;
-  // currencies uses code as PK
-  if (slug === "currencies") {
-    const v = parsed.data as { code: string; name: string; symbol: string; exchangeRate: number };
-    await db
-      .insert(table)
-      .values({ code: v.code, name: v.name, symbol: v.symbol, exchangeRate: v.exchangeRate })
-      .onConflictDoNothing();
-  } else {
-    await db.insert(table).values(parsed.data as never);
+  try {
+    await api.post(`/settings/${slug}`, parsed.data);
+  } catch (err) {
+    return { ok: false, errors: fieldErrorsFrom(err) };
   }
-
-  await logActivity({
-    action: `created ${slug.replace(/s$/, "")} setting`,
-    entityType: `setting_${slug}`,
-  });
-
-  revalidateEntity(slug);
-  return { ok: true as const };
+  revalidatePath(ENTITY_PATHS[slug]);
+  return { ok: true };
 }
 
 export async function updateSettingEntity(
   slug: EntitySlug,
   id: string,
   values: Record<string, unknown>,
-) {
+): Promise<ActionResult> {
   const schema = ENTITY_SCHEMAS[slug];
   if (!schema) throw new Error(`Unknown settings entity: ${slug}`);
   const parsed = schema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false as const, errors: z.flattenError(parsed.error) };
+    return { ok: false, errors: z.flattenError(parsed.error) as unknown as Record<string, string[]> };
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const table = ENTITY_TABLES[slug] as any;
-  const v = parsed.data as Record<string, unknown>;
-  if (slug === "currencies") {
-    await db
-      .update(table)
-      .set({ name: v.name as string, symbol: v.symbol as string, exchangeRate: v.exchangeRate as number })
-      .where(eq((table as typeof currencies).code, id));
-  } else if (slug === "taxes") {
-    await db
-      .update(table)
-      .set({
-        name: v.name as string,
-        rate: v.rate as number,
-        isGroup: (v.isGroup as boolean) ?? false,
-      })
-      .where(eq((table as typeof taxes).id, id));
-  } else {
-    await db
-      .update(table)
-      .set({ name: v.name as string, description: (v.description as string) || null })
-      .where(eq((table as typeof units).id, id));
+  try {
+    await api.patch(`/settings/${slug}/${encodeURIComponent(id)}`, parsed.data);
+  } catch (err) {
+    return { ok: false, errors: fieldErrorsFrom(err) };
   }
-
-  revalidateEntity(slug);
-  return { ok: true as const };
+  revalidatePath(ENTITY_PATHS[slug]);
+  return { ok: true };
 }
 
-export async function deleteSettingEntity(slug: EntitySlug, id: string) {
-  const table = ENTITY_TABLES[slug];
+export async function deleteSettingEntity(slug: EntitySlug, id: string): Promise<ActionResult> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const table = ENTITY_TABLES[slug] as any;
-    if (slug === "currencies") {
-      await db.delete(table).where(eq(table.code, id));
-    } else {
-      await db.delete(table).where(eq(table.id, id));
+    await api.delete(`/settings/${slug}/${encodeURIComponent(id)}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.message.includes("in use")) {
+      return { ok: false, error: "This item is in use and cannot be deleted." };
     }
-  } catch {
-    return {
-      ok: false as const,
-      error: "This item is in use and cannot be deleted.",
-    };
+    return { ok: false, error: "Failed to delete." };
   }
-
-  revalidateEntity(slug);
-  return { ok: true as const };
+  revalidatePath(ENTITY_PATHS[slug]);
+  return { ok: true };
 }
 
 // ---------- organization profile
@@ -184,45 +117,19 @@ const orgSchema = z.object({
   timezone: z.string().optional(),
 });
 
-export async function updateOrganization(values: Record<string, unknown>) {
+export async function updateOrganization(values: Record<string, unknown>): Promise<ActionResult> {
   const parsed = orgSchema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false as const, errors: z.flattenError(parsed.error) };
+    return { ok: false, errors: z.flattenError(parsed.error) as unknown as Record<string, string[]> };
   }
-  const data = parsed.data;
-
-  const [org] = await db.select().from(organization).limit(1);
-  const payload = {
-    name: data.name,
-    legalName: data.legalName || null,
-    addressLine1: data.addressLine1 || null,
-    city: data.city || null,
-    state: data.state || null,
-    zip: data.zip || null,
-    country: data.country || null,
-    phone: data.phone || null,
-    email: data.email || null,
-    website: data.website || null,
-    taxId: data.taxId || null,
-    currencyCode: data.currencyCode || "IDR",
-    timezone: data.timezone || "Asia/Jakarta",
-    updatedAt: new Date(),
-  };
-
-  if (org) {
-    await db.update(organization).set(payload).where(eq(organization.id, org.id));
-  } else {
-    await db.insert(organization).values(payload);
+  try {
+    await api.patch("/settings/organization", parsed.data);
+  } catch (err) {
+    return { ok: false, errors: fieldErrorsFrom(err) };
   }
-
-  await logActivity({
-    action: "updated organization profile",
-    entityType: "organization",
-  });
-
   revalidatePath("/office/settings/organization");
   revalidatePath("/office");
-  return { ok: true as const };
+  return { ok: true };
 }
 
 // ---------- numbering series
@@ -230,7 +137,7 @@ export async function updateOrganization(values: Record<string, unknown>) {
 export async function updateNumberingSeries(
   module: string,
   values: { prefix: string; nextNumber: number; padding: number },
-) {
+): Promise<ActionResult> {
   const parsed = z
     .object({
       prefix: z.string().min(1, "Prefix is required"),
@@ -239,31 +146,20 @@ export async function updateNumberingSeries(
     })
     .safeParse(values);
   if (!parsed.success) {
-    return { ok: false as const, errors: z.flattenError(parsed.error) };
+    return { ok: false, errors: z.flattenError(parsed.error) as unknown as Record<string, string[]> };
   }
-
-  await db
-    .update(numberingSeries)
-    .set({
-      prefix: parsed.data.prefix,
-      nextNumber: parsed.data.nextNumber,
-      padding: parsed.data.padding,
-    })
-    .where(eq(numberingSeries.module, module));
-
-  await logActivity({
-    action: `updated numbering series for ${module}`,
-    entityType: "numbering_series",
-    entityLabel: module,
-  });
-
+  try {
+    await api.patch(`/settings/numbering-series/${encodeURIComponent(module)}`, parsed.data);
+  } catch (err) {
+    return { ok: false, errors: fieldErrorsFrom(err) };
+  }
   revalidatePath("/office/settings/numbering-series");
-  return { ok: true as const };
+  return { ok: true };
 }
 
 // ---------- users & roles
 
-export async function inviteUser(values: { name: string; email: string; roleId?: string }) {
+export async function inviteUser(values: { name: string; email: string; roleId?: string }): Promise<ActionResult> {
   const parsed = z
     .object({
       name: z.string().min(1, "Name is required"),
@@ -272,46 +168,35 @@ export async function inviteUser(values: { name: string; email: string; roleId?:
     })
     .safeParse(values);
   if (!parsed.success) {
-    return { ok: false as const, errors: z.flattenError(parsed.error) };
+    return { ok: false, errors: z.flattenError(parsed.error) as unknown as Record<string, string[]> };
   }
-
   try {
-    await db.insert(users).values({
-      name: parsed.data.name,
-      email: parsed.data.email,
-      roleId: parsed.data.roleId || null,
-    });
-  } catch {
-    return { ok: false as const, errors: { email: ["Email already invited"] } };
+    await api.post("/settings/users", parsed.data);
+  } catch (err) {
+    if (err instanceof ApiError && err.fieldErrors?.email) {
+      return { ok: false, errors: { email: ["Email already invited"] } };
+    }
+    return { ok: false, errors: fieldErrorsFrom(err) };
   }
-
-  await logActivity({
-    action: "invited user",
-    entityType: "user",
-    entityLabel: parsed.data.name,
-  });
-
   revalidatePath("/office/settings/users");
-  return { ok: true as const };
+  return { ok: true };
 }
 
 export async function setUserStatus(id: string, status: "active" | "inactive") {
-  await db.update(users).set({ status }).where(eq(users.id, id));
+  await api.patch(`/settings/users/${id}/status`, { status });
   revalidatePath("/office/settings/users");
 }
 
 export async function deleteUser(id: string) {
-  await db.delete(users).where(eq(users.id, id));
-  await logActivity({
-    action: "removed user",
-    entityType: "user",
-    entityId: id,
-  });
+  await api.delete(`/settings/users/${id}`);
   revalidatePath("/office/settings/users");
 }
 
 export async function listRoles() {
-  return db.select().from(roles);
+  const { roles } = await api.get<{ users: unknown[]; roles: { id: string; name: string }[] }>(
+    "/settings/users",
+  );
+  return roles;
 }
 
 // ---------- templates
@@ -323,70 +208,43 @@ const templateSchema = z.object({
   body: z.string().optional(),
 });
 
-export async function createTemplate(values: Record<string, unknown>) {
+export async function createTemplate(values: Record<string, unknown>): Promise<ActionResult> {
   const parsed = templateSchema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false as const, errors: z.flattenError(parsed.error) };
+    return { ok: false, errors: z.flattenError(parsed.error) as unknown as Record<string, string[]> };
   }
-  const [tpl] = await db
-    .insert(templates)
-    .values({
-      name: parsed.data.name,
-      type: parsed.data.type,
-      subject: parsed.data.subject || null,
-      body: parsed.data.body || null,
-    })
-    .returning();
-
-  await logActivity({
-    action: "created template",
-    entityType: "template",
-    entityId: tpl.id,
-    entityLabel: tpl.name,
-  });
+  try {
+    await api.post("/settings/templates", parsed.data);
+  } catch (err) {
+    return { ok: false, errors: fieldErrorsFrom(err) };
+  }
   revalidatePath("/office/settings/templates");
-  return { ok: true as const };
+  return { ok: true };
 }
 
-export async function updateTemplate(
-  id: string,
-  values: Record<string, unknown>,
-) {
+export async function updateTemplate(id: string, values: Record<string, unknown>): Promise<ActionResult> {
   const parsed = templateSchema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false as const, errors: z.flattenError(parsed.error) };
+    return { ok: false, errors: z.flattenError(parsed.error) as unknown as Record<string, string[]> };
   }
-  await db
-    .update(templates)
-    .set({
-      name: parsed.data.name,
-      type: parsed.data.type,
-      subject: parsed.data.subject || null,
-      body: parsed.data.body || null,
-    })
-    .where(eq(templates.id, id));
-
+  try {
+    await api.patch(`/settings/templates/${id}`, parsed.data);
+  } catch (err) {
+    return { ok: false, errors: fieldErrorsFrom(err) };
+  }
   revalidatePath("/office/settings/templates");
-  return { ok: true as const };
+  return { ok: true };
 }
 
 export async function deleteTemplate(id: string) {
-  await db.delete(templates).where(eq(templates.id, id));
+  await api.delete(`/settings/templates/${id}`);
   revalidatePath("/office/settings/templates");
 }
 
-// ---------- preference flags (notifications / automations)
+// ---------- preference flags
 
-export async function setOrgFlag(key: string, value: boolean) {
-  const [existing] = await db
-    .select()
-    .from(orgFlags)
-    .where(eq(orgFlags.key, key));
-  if (existing) {
-    await db.update(orgFlags).set({ value }).where(eq(orgFlags.id, existing.id));
-  } else {
-    await db.insert(orgFlags).values({ key, value });
-  }
+export async function setOrgFlag(key: string, value: boolean): Promise<ActionResult> {
+  await api.put(`/settings/flags/${encodeURIComponent(key)}`, { value });
   revalidatePath("/office/settings/preferences");
-  return { ok: true as const };
+  return { ok: true };
 }

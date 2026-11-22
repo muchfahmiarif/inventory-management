@@ -1,75 +1,89 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import TransactionForm from "@/components/office/transactions/transaction-form";
 import type { TransactionFormValues } from "@/components/office/transactions/transaction-form";
 import { updateEstimate } from "@/actions/estimates";
-import { db } from "@/db";
-import { contacts, estimateLines, estimates, items, taxes } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
 
-export default async function EditEstimatePage({
+type DocDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  contactId: string;
+  status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired";
+  reference: string | null;
+  notes: string | null;
+  terms: string | null;
+  expiryDate: string | null;
+  subtotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  total: number;
+  customerName: string;
+  lines: {
+    id: string;
+    itemId: string;
+    itemName: string;
+    description: string | null;
+    quantity: number;
+    rate: number;
+    discountPercent: number;
+    taxId: string;
+    taxName: string | null;
+    amount: number;
+  }[];
+};
+
+type TxnOptions = {
+  contacts: { id: string; name: string }[];
+  items: { id: string; name: string; sellingPrice: number | null }[];
+  taxes: { id: string; name: string; rate: number }[];
+};
+
+export default async function EditEstimatesPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
 
-  const [estimate] = await db.select().from(estimates).where(eq(estimates.id, id));
-  if (!estimate) notFound();
-
-  const [contactRows, itemRows, taxRows, lineRows] = await Promise.all([
-    db
-      .select({ id: contacts.id, name: contacts.displayName })
-      .from(contacts)
-      .where(eq(contacts.type, "customer"))
-      .orderBy(asc(contacts.displayName)),
-    db
-      .select({ id: items.id, name: items.name, sellingPrice: items.sellingPrice })
-      .from(items)
-      .orderBy(asc(items.name)),
-    db.select({ id: taxes.id, name: taxes.name, rate: taxes.rate }).from(taxes).orderBy(asc(taxes.name)),
-    db
-      .select({
-        itemId: estimateLines.itemId,
-        description: estimateLines.description,
-        quantity: estimateLines.quantity,
-        rate: estimateLines.rate,
-        discountPercent: estimateLines.discountPercent,
-        taxId: estimateLines.taxId,
-      })
-      .from(estimateLines)
-      .where(eq(estimateLines.estimateId, id))
-      .orderBy(asc(estimateLines.id)),
-  ]);
+  let doc: DocDetailData;
+  try {
+    doc = await api.get<DocDetailData>(`/estimates/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
+  const options = await api.get<TxnOptions>("/txn-form-options");
 
   const defaults: TransactionFormValues = {
-    date: estimate.date,
-    contactId: estimate.contactId,
-    reference: estimate.reference ?? undefined,
-    expiryDate: estimate.expiryDate ?? undefined,
-    notes: estimate.notes ?? undefined,
-    terms: estimate.terms ?? undefined,
-    lines: lineRows.map((l) => ({
+    date: doc.date,
+    contactId: doc.contactId,
+    reference: doc.reference ?? undefined,
+    expiryDate: doc.expiryDate ?? undefined,
+    notes: doc.notes ?? undefined,
+    terms: doc.terms ?? undefined,
+    lines: doc.lines.map((l) => ({
       itemId: l.itemId,
       description: l.description ?? undefined,
       quantity: String(l.quantity),
       rate: String(l.rate),
       discountPercent: String(l.discountPercent),
-      taxId: l.taxId ?? "none",
+      taxId: l.taxId || "none",
     })),
   };
 
   return (
     <TransactionForm
       mode="edit"
-      transactionId={estimate.id}
-      title={`Edit ${estimate.number}`}
+      transactionId={doc.id}
+      title={`Edit ${doc.number}`}
       contactLabel="Customer"
-      submitAction={updateEstimate.bind(null, estimate.id)}
+      submitAction={updateEstimate.bind(null, doc.id)}
       defaultValues={defaults}
-      contacts={contactRows}
-      items={itemRows}
-      taxes={taxRows}
+      contacts={options.contacts}
+      items={options.items}
+      taxes={options.taxes}
       extraDateLabel="Expiry Date"
       extraDateKey="expiryDate"
     />

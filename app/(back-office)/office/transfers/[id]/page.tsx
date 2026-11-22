@@ -1,10 +1,18 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { alias } from "drizzle-orm/pg-core";
 
 import { TransferDetail } from "@/components/office/transfers/transfer-views";
-import { db } from "@/db";
-import { items, transferOrderLines, transferOrders, warehouses } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type TransferDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  status: "draft" | "shipped" | "received";
+  notes: string | null;
+  fromWarehouseName: string | null;
+  toWarehouseName: string | null;
+  lines: { id: string; itemName: string; sku: string | null; quantity: number }[];
+};
 
 export default async function TransferDetailPage({
   params,
@@ -12,49 +20,14 @@ export default async function TransferDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const fromW = alias(warehouses, "from_w");
-  const toW = alias(warehouses, "to_w");
 
-  const [transfer] = await db
-    .select({
-      id: transferOrders.id,
-      number: transferOrders.number,
-      date: transferOrders.date,
-      status: transferOrders.status,
-      notes: transferOrders.notes,
-      fromWarehouseName: fromW.name,
-      toWarehouseName: toW.name,
-    })
-    .from(transferOrders)
-    .leftJoin(fromW, eq(transferOrders.fromWarehouseId, fromW.id))
-    .leftJoin(toW, eq(transferOrders.toWarehouseId, toW.id))
-    .where(eq(transferOrders.id, id));
+  let data: TransferDetailData;
+  try {
+    data = await api.get<TransferDetailData>(`/transfers/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!transfer) notFound();
-
-  const lines = await db
-    .select({
-      id: transferOrderLines.id,
-      itemName: items.name,
-      sku: items.sku,
-      quantity: transferOrderLines.quantity,
-    })
-    .from(transferOrderLines)
-    .innerJoin(items, eq(transferOrderLines.itemId, items.id))
-    .where(eq(transferOrderLines.transferOrderId, id))
-    .orderBy(asc(items.name));
-
-  return (
-    <TransferDetail
-      data={{
-        ...transfer,
-        lines: lines.map((l) => ({
-          id: l.id,
-          itemName: l.itemName,
-          sku: l.sku,
-          quantity: Number(l.quantity),
-        })),
-      }}
-    />
-  );
+  return <TransferDetail data={data} />;
 }

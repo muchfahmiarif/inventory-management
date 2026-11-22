@@ -1,34 +1,25 @@
-import { asc, ne } from "drizzle-orm";
-
 import { StockCountForm } from "@/components/office/stock-counts/stock-count-views";
-import { db } from "@/db";
-import { items, warehouses } from "@/db/schema";
-import { getStockByItem } from "@/lib/stock";
+import { api } from "@/lib/api-client";
+
+type StockCountOptions = {
+  warehouses: { id: string; name: string }[];
+  items: { id: string; name: string; sku: string | null }[];
+  stockByItem: Record<string, number>;
+};
 
 export default async function NewStockCountPage() {
-  const [warehouseRows, itemRows, stockMap] = await Promise.all([
-    db
-      .select({ id: warehouses.id, name: warehouses.name })
-      .from(warehouses)
-      .orderBy(asc(warehouses.name)),
-    db
-      .select({ id: items.id, name: items.name, sku: items.sku, type: items.type })
-      .from(items)
-      .where(ne(items.type, "service"))
-      .orderBy(asc(items.name)),
-    getStockByItem(),
-  ]);
+  const options = await api.get<StockCountOptions>("/stock-counts/form-options");
 
   return (
     <StockCountForm
       defaultValues={{
         date: new Date().toISOString().slice(0, 10),
-        warehouseId: warehouseRows[0]?.id ?? "",
+        warehouseId: options.warehouses[0]?.id ?? "",
         lines: [{ itemId: "", countedQuantity: "" }],
       }}
-      warehouses={warehouseRows}
-      items={itemRows.map((i) => ({ id: i.id, name: i.name, sku: i.sku }))}
-      stockByItem={Object.fromEntries(stockMap)}
+      warehouses={options.warehouses}
+      items={options.items}
+      stockByItem={options.stockByItem}
     />
   );
 }

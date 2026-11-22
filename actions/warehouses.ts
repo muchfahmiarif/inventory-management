@@ -1,13 +1,10 @@
 "use server";
 
-import { eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { db } from "@/db";
-import { warehouses } from "@/db/schema";
-import { logActivity } from "@/lib/activity";
+import { api } from "@/lib/api-client";
 import {
   warehouseFormSchema,
   type WarehouseFormInput,
@@ -15,46 +12,14 @@ import {
 
 const PATH = "/office/warehouse";
 
-function toValues(data: z.output<typeof warehouseFormSchema>) {
-  return {
-    name: data.name,
-    code: data.code || null,
-    addressLine1: data.addressLine1 || null,
-    city: data.city || null,
-    state: data.state || null,
-    zip: data.zip || null,
-    country: data.country || null,
-    contactName: data.contactName || null,
-    phone: data.phone || null,
-    email: data.email || null,
-    isDefault: data.isDefault ?? false,
-    updatedAt: new Date(),
-  };
-}
+// Thin proxies to the Go backend; signatures match the original actions.
 
 export async function createWarehouse(input: WarehouseFormInput) {
   const parsed = warehouseFormSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false as const, errors: z.flattenError(parsed.error) };
   }
-  const data = parsed.data;
-
-  const id = await db.transaction(async (tx) => {
-    // Only one default warehouse
-    if (data.isDefault) {
-      await tx.update(warehouses).set({ isDefault: false });
-    }
-    const [warehouse] = await tx.insert(warehouses).values(toValues(data)).returning();
-    return warehouse.id;
-  });
-
-  await logActivity({
-    action: "created warehouse",
-    entityType: "warehouse",
-    entityId: id,
-    entityLabel: data.name,
-  });
-
+  const { id } = await api.post<{ id: string }>("/warehouses", parsed.data);
   revalidatePath(PATH);
   redirect(`${PATH}/${id}`);
 }
@@ -64,40 +29,20 @@ export async function updateWarehouse(id: string, input: WarehouseFormInput) {
   if (!parsed.success) {
     return { ok: false as const, errors: z.flattenError(parsed.error) };
   }
-  const data = parsed.data;
-
-  await db.transaction(async (tx) => {
-    if (data.isDefault) {
-      await tx.update(warehouses).set({ isDefault: false });
-    }
-    await tx.update(warehouses).set(toValues(data)).where(eq(warehouses.id, id));
-  });
-
-  await logActivity({
-    action: "updated warehouse",
-    entityType: "warehouse",
-    entityId: id,
-    entityLabel: data.name,
-  });
-
+  await api.patch(`/warehouses/${id}`, parsed.data);
   revalidatePath(PATH);
   revalidatePath(`${PATH}/${id}`);
   redirect(`${PATH}/${id}`);
 }
 
 export async function deleteWarehouse(id: string) {
-  await db.delete(warehouses).where(eq(warehouses.id, id));
-  await logActivity({
-    action: "deleted warehouse",
-    entityType: "warehouse",
-    entityId: id,
-  });
+  await api.delete(`/warehouses/${id}`);
   revalidatePath(PATH);
   redirect(PATH);
 }
 
 export async function deleteWarehouses(ids: string[]) {
   if (!ids.length) return;
-  await db.delete(warehouses).where(inArray(warehouses.id, ids));
+  await api.post("/warehouses/bulk-delete", { ids });
   revalidatePath(PATH);
 }

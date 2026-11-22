@@ -4,11 +4,18 @@ import { Separator } from "@/components/ui/separator";
 import { Check, Ellipsis, FileText, Package } from "lucide-react";
 import React from "react";
 
-import { getDashboardStats } from "@/lib/dashboard";
+import { api } from "@/lib/api-client";
 import { formatQty } from "@/lib/format";
 
 const DashboardPage = async () => {
-  const stats = await getDashboardStats();
+  const stats = await api.get<{
+    toBePacked: number;
+    toBeShipped: number;
+    toBeDelivered: number;
+    toBeInvoiced: number;
+    quantityInHand: number;
+    quantityToBeReceived: number;
+  }>("/dashboard");
 
   return (
     <div className="flex h-[200rem] flex-col items-center bg-primary-foreground dark:bg-background">

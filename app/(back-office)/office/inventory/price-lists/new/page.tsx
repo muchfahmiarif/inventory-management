@@ -1,20 +1,16 @@
-import { asc } from "drizzle-orm";
-
 import { PriceListForm } from "@/components/office/inventory/price-lists/price-list-views";
-import { db } from "@/db";
-import { currencies } from "@/db/schema";
+import { api } from "@/lib/api-client";
+
+type CurrencyOption = { code: string; name: string; symbol: string };
 
 export default async function NewPriceListPage() {
-  const currencyRows = await db
-    .select({ code: currencies.code, name: currencies.name, symbol: currencies.symbol })
-    .from(currencies)
-    .orderBy(asc(currencies.code));
+  const currencies = await api.get<CurrencyOption[]>("/price-lists/currency-options");
 
   return (
     <PriceListForm
       mode="new"
       defaultValues={{ name: "", currencyCode: "IDR", priceType: "markup", percentage: "0" }}
-      currencies={currencyRows}
+      currencies={currencies}
     />
   );
 }

@@ -1,9 +1,20 @@
 import Link from "next/link";
 
 import PackageForm from "@/components/office/transactions/package-form";
-import { db } from "@/db";
-import { contacts, salesOrderLines, salesOrders, warehouses } from "@/db/schema";
-import { asc, eq, inArray } from "drizzle-orm";
+import { api } from "@/lib/api-client";
+
+type EligibleSO = {
+  id: string;
+  number: string;
+  status: string;
+  customerName: string | null;
+};
+
+type PackageFormOptions = {
+  salesOrder: { id: string; number: string; customerName: string };
+  warehouses: { id: string; name: string }[];
+  lines: { itemId: string; name: string; ordered: number }[];
+};
 
 export default async function NewPackagePage({
   searchParams,
@@ -13,18 +24,7 @@ export default async function NewPackagePage({
   const { soId } = await searchParams;
 
   if (!soId) {
-    // SO picker: eligible orders are confirmed or packed
-    const eligible = await db
-      .select({
-        id: salesOrders.id,
-        number: salesOrders.number,
-        status: salesOrders.status,
-        customerName: contacts.displayName,
-      })
-      .from(salesOrders)
-      .leftJoin(contacts, eq(salesOrders.contactId, contacts.id))
-      .where(inArray(salesOrders.status, ["confirmed", "packed"]))
-      .orderBy(asc(salesOrders.number));
+    const eligible = await api.get<EligibleSO[]>("/packages/eligible-sales-orders");
 
     return (
       <div className="flex flex-col px-8 py-6">
@@ -56,52 +56,25 @@ export default async function NewPackagePage({
     );
   }
 
-  const [so] = await db
-    .select({
-      id: salesOrders.id,
-      number: salesOrders.number,
-      customerName: contacts.displayName,
-    })
-    .from(salesOrders)
-    .leftJoin(contacts, eq(salesOrders.contactId, contacts.id))
-    .where(eq(salesOrders.id, soId));
-  if (!so) throw new Error("Sales order not found");
-
-  const [warehouseRows, lineRows] = await Promise.all([
-    db
-      .select({ id: warehouses.id, name: warehouses.name })
-      .from(warehouses)
-      .orderBy(asc(warehouses.name)),
-    db
-      .select({
-        itemId: salesOrderLines.itemId,
-        name: salesOrderLines.name,
-        quantity: salesOrderLines.quantity,
-      })
-      .from(salesOrderLines)
-      .where(eq(salesOrderLines.salesOrderId, soId))
-      .orderBy(asc(salesOrderLines.id)),
-  ]);
+  const options = await api.get<PackageFormOptions>(
+    `/packages/form-options?soId=${encodeURIComponent(soId)}`,
+  );
 
   return (
     <PackageForm
-      soId={so.id}
-      soNumber={so.number}
-      customerName={so.customerName ?? "Unknown"}
+      soId={options.salesOrder.id}
+      soNumber={options.salesOrder.number}
+      customerName={options.salesOrder.customerName}
       defaultValues={{
         date: new Date().toISOString().slice(0, 10),
-        warehouseId: warehouseRows[0]?.id ?? "",
-        lines: lineRows.map((l) => ({
+        warehouseId: options.warehouses[0]?.id ?? "",
+        lines: options.lines.map((l) => ({
           itemId: l.itemId,
-          quantity: String(l.quantity),
+          quantity: String(l.ordered),
         })),
       }}
-      warehouses={warehouseRows}
-      lines={lineRows.map((l) => ({
-        itemId: l.itemId,
-        name: l.name,
-        ordered: Number(l.quantity),
-      }))}
+      warehouses={options.warehouses}
+      lines={options.lines}
     />
   );
 }

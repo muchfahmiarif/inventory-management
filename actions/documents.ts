@@ -1,78 +1,50 @@
 "use server";
 
-import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { unlink } from "node:fs/promises";
-import path from "node:path";
+import { revalidatePath } from "next/cache";
 
-import { db } from "@/db";
-import { documents } from "@/db/schema";
-import { logActivity } from "@/lib/activity";
+import { ApiError } from "@/lib/api-client";
 
-const UPLOAD_DIR = path.join(process.cwd(), ".data", "uploads");
+const BASE_URL = process.env.BACKEND_API_URL ?? "http://localhost:8080/api/v1";
 
+// uploadDocument forwards the multipart form to the Go backend, which stores
+// the file through the configured storage backend (local | s3 | mega).
 export async function uploadDocument(formData: FormData) {
-  const file = formData.get("file");
-  if (!(file instanceof File) || file.size === 0) {
-    throw new Error("No file provided");
-  }
+  const { getToken } = await auth();
+  const token = await getToken();
 
-  const entityType = String(formData.get("entityType") ?? "general");
-  const entityId = (formData.get("entityId") as string) || null;
-  const entityLabel = (formData.get("entityLabel") as string) || null;
+  const headers: HeadersInit = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const { randomUUID } = await import("node:crypto");
-  const storedName = `${randomUUID()}-${file.name.replace(/[^\w.\-]/g, "_")}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  const { mkdir, writeFile } = await import("node:fs/promises");
-  await mkdir(UPLOAD_DIR, { recursive: true });
-  await writeFile(path.join(UPLOAD_DIR, storedName), buffer);
-
-  const [doc] = await db
-    .insert(documents)
-    .values({
-      fileName: file.name,
-      storedName,
-      mimeType: file.type || null,
-      sizeBytes: file.size,
-      entityType,
-      entityId,
-      entityLabel,
-    })
-    .returning();
-
-  await logActivity({
-    action: "uploaded document",
-    entityType: "document",
-    entityId: doc.id,
-    entityLabel: file.name,
+  const res = await fetch(`${BASE_URL}/documents`, {
+    method: "POST",
+    headers,
+    body: formData, // multipart passthrough — Go parses file + fields
   });
-
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.error ?? `Upload failed (${res.status})`);
+  }
   revalidatePath("/office/documents");
 }
 
 export async function deleteDocument(id: string) {
-  const [doc] = await db.select().from(documents).where(eq(documents.id, id));
-  if (doc) {
-    await unlink(path.join(UPLOAD_DIR, doc.storedName)).catch(() => {
-      // file already gone — still remove the row
-    });
-    await db.delete(documents).where(eq(documents.id, id));
-    await logActivity({
-      action: "deleted document",
-      entityType: "document",
-      entityId: id,
-      entityLabel: doc.fileName,
-    });
+  const { getToken } = await auth();
+  const token = await getToken();
+
+  const res = await fetch(`${BASE_URL}/documents/${id}`, {
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.error ?? `Delete failed (${res.status})`);
   }
   revalidatePath("/office/documents");
 }
 
-// Download target for the documents list
+// Download target for the documents list — streams from Go via the proxy route.
 export async function redirectToDocument(id: string) {
-  const [doc] = await db.select().from(documents).where(eq(documents.id, id));
-  if (!doc) redirect("/office/documents");
   redirect(`/api/documents/${id}`);
 }

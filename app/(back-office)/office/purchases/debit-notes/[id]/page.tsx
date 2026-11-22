@@ -1,9 +1,35 @@
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
 import { DebitNoteDetail } from "@/components/office/transactions/debit-note-views";
-import { db } from "@/db";
-import { contacts, debitNoteLines, debitNotes } from "@/db/schema";
+import { ApiError, api } from "@/lib/api-client";
+
+type DebitNoteDetailData = {
+  id: string;
+  number: string;
+  date: string;
+  contactId: string;
+  status: "open" | "closed" | "void";
+  reference: string | null;
+  notes: string | null;
+  terms: string | null;
+  subtotal: number;
+  discountTotal: number;
+  taxTotal: number;
+  total: number;
+  vendorName: string;
+  lines: {
+    id: string;
+    itemId: string;
+    itemName: string;
+    description: string | null;
+    quantity: number;
+    rate: number;
+    discountPercent: number;
+    taxId: string;
+    taxName: string | null;
+    amount: number;
+  }[];
+};
 
 export default async function DebitNoteDetailPage({
   params,
@@ -12,47 +38,13 @@ export default async function DebitNoteDetailPage({
 }) {
   const { id } = await params;
 
-  const [note] = await db
-    .select({
-      id: debitNotes.id,
-      number: debitNotes.number,
-      date: debitNotes.date,
-      status: debitNotes.status,
-      reference: debitNotes.reference,
-      notes: debitNotes.notes,
-      total: debitNotes.total,
-      vendorName: contacts.displayName,
-    })
-    .from(debitNotes)
-    .leftJoin(contacts, eq(debitNotes.contactId, contacts.id))
-    .where(eq(debitNotes.id, id));
+  let data: DebitNoteDetailData;
+  try {
+    data = await api.get<DebitNoteDetailData>(`/debit-notes/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
-  if (!note) notFound();
-
-  const lines = await db
-    .select({
-      id: debitNoteLines.id,
-      itemName: debitNoteLines.name,
-      quantity: debitNoteLines.quantity,
-      rate: debitNoteLines.rate,
-      amount: debitNoteLines.amount,
-    })
-    .from(debitNoteLines)
-    .where(eq(debitNoteLines.debitNoteId, id))
-    .orderBy(asc(debitNoteLines.id));
-
-  return (
-    <DebitNoteDetail
-      data={{
-        ...note,
-        vendorName: note.vendorName ?? "Unknown",
-        lines: lines.map((l) => ({
-          ...l,
-          quantity: Number(l.quantity),
-          rate: Number(l.rate),
-          amount: Number(l.amount),
-        })),
-      }}
-    />
-  );
+  return <DebitNoteDetail data={data} />;
 }

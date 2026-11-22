@@ -1,30 +1,18 @@
-import { asc, eq } from "drizzle-orm";
-
 import { UsersClient } from "@/components/office/settings/users-client";
-import { db } from "@/db";
-import { roles, users } from "@/db/schema";
+import { api } from "@/lib/api-client";
+
+type UserRow = {
+  id: string;
+  name: string;
+  email: string;
+  status: "active" | "inactive";
+  roleName: string | null;
+};
+
+type RoleRow = { id: string; name: string };
 
 export default async function UsersSettingsPage() {
-  const [userRows, roleRows] = await Promise.all([
-    db
-      .select({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        status: users.status,
-        roleName: roles.name,
-      })
-      .from(users)
-      .leftJoin(roles, eq(users.roleId, roles.id))
-      .orderBy(asc(users.name)),
-    db.select({ id: roles.id, name: roles.name }).from(roles).orderBy(asc(roles.name)),
-  ]);
+  const { users, roles } = await api.get<{ users: UserRow[]; roles: RoleRow[] }>("/settings/users");
 
-  return (
-    <UsersClient
-      users={userRows}
-      roles={roleRows}
-    />
-  );
+  return <UsersClient users={users} roles={roles} />;
 }
-

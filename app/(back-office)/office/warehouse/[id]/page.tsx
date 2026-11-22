@@ -1,9 +1,7 @@
-import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 
-import { WarehouseDetail } from "@/components/office/warehouse/warehouse-views";
-import { db } from "@/db";
-import { warehouses } from "@/db/schema";
+import { WarehouseDetail, type WarehouseDetailData } from "@/components/office/warehouse/warehouse-views";
+import { ApiError, api } from "@/lib/api-client";
 
 export default async function WarehouseDetailPage({
   params,
@@ -11,8 +9,14 @@ export default async function WarehouseDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [w] = await db.select().from(warehouses).where(eq(warehouses.id, id));
-  if (!w) notFound();
+
+  let w: WarehouseDetailData;
+  try {
+    w = await api.get<WarehouseDetailData>(`/warehouses/${id}`);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) notFound();
+    throw err;
+  }
 
   return <WarehouseDetail data={w} />;
 }
